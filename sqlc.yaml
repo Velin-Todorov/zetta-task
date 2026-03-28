@@ -1,0 +1,9 @@
+version: "2"
+sql:
+  - engine: "mysql"
+    queries: "sql/queries/book.sql"
+    schema: "sql/schema/001_books.up.sql"
+    gen:
+      go:
+        package: "db"
+        out: "internal/db"
