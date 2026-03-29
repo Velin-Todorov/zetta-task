@@ -44,8 +44,8 @@ func DecodeGetBooksRequest(mux goahttp.Muxer, decoder func(*http.Request) goahtt
 			publishedAt     *string
 			publishedAfter  *string
 			publishedBefore *string
-			limit           *int64
-			offset          *int64
+			limit           *uint64
+			offset          *uint64
 			err             error
 		)
 		qp := r.URL.Query()
@@ -91,9 +91,9 @@ func DecodeGetBooksRequest(mux goahttp.Muxer, decoder func(*http.Request) goahtt
 		{
 			limitRaw := qp.Get("limit")
 			if limitRaw != "" {
-				v, err2 := strconv.ParseInt(limitRaw, 10, 64)
+				v, err2 := strconv.ParseUint(limitRaw, 10, 64)
 				if err2 != nil {
-					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("limit", limitRaw, "integer"))
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("limit", limitRaw, "unsigned integer"))
 				}
 				limit = &v
 			}
@@ -101,9 +101,9 @@ func DecodeGetBooksRequest(mux goahttp.Muxer, decoder func(*http.Request) goahtt
 		{
 			offsetRaw := qp.Get("offset")
 			if offsetRaw != "" {
-				v, err2 := strconv.ParseInt(offsetRaw, 10, 64)
+				v, err2 := strconv.ParseUint(offsetRaw, 10, 64)
 				if err2 != nil {
-					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("offset", offsetRaw, "integer"))
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("offset", offsetRaw, "unsigned integer"))
 				}
 				offset = &v
 			}
@@ -114,6 +114,38 @@ func DecodeGetBooksRequest(mux goahttp.Muxer, decoder func(*http.Request) goahtt
 		payload = NewGetBooksPayload(title, author, publishedAt, publishedAfter, publishedBefore, limit, offset)
 
 		return payload, nil
+	}
+}
+
+// EncodeGetBooksError returns an encoder for errors returned by the getBooks
+// books endpoint.
+func EncodeGetBooksError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(ctx context.Context, err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		var en goa.GoaErrorNamer
+		if !errors.As(v, &en) {
+			return encodeError(ctx, w, v)
+		}
+		switch en.GoaErrorName() {
+		case "internal_error":
+			var res books.InternalError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "not_found":
+			var res books.NotFound
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
 	}
 }
 
@@ -155,6 +187,38 @@ func DecodeGetBookRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp
 		payload = NewGetBookPayload(id)
 
 		return payload, nil
+	}
+}
+
+// EncodeGetBookError returns an encoder for errors returned by the getBook
+// books endpoint.
+func EncodeGetBookError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(ctx context.Context, err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		var en goa.GoaErrorNamer
+		if !errors.As(v, &en) {
+			return encodeError(ctx, w, v)
+		}
+		switch en.GoaErrorName() {
+		case "internal_error":
+			var res books.InternalError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "not_found":
+			var res books.NotFound
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
 	}
 }
 
@@ -201,44 +265,43 @@ func DecodeCreateBookRequest(mux goahttp.Muxer, decoder func(*http.Request) goah
 	}
 }
 
-// EncodeCreateBookCoverResponse returns an encoder for responses returned by
-// the books createBookCover endpoint.
-func EncodeCreateBookCoverResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
-	return func(ctx context.Context, w http.ResponseWriter, v any) error {
-		res, _ := v.(*books.Book)
-		ctx = context.WithValue(ctx, goahttp.ContentTypeKey, "application/json")
-		enc := encoder(ctx, w)
-		body := NewCreateBookCoverResponseBody(res)
-		w.WriteHeader(http.StatusCreated)
-		return enc.Encode(body)
-	}
-}
-
-// DecodeCreateBookCoverRequest returns a decoder for requests sent to the
-// books createBookCover endpoint.
-func DecodeCreateBookCoverRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (*books.CreateBookCoverPayload, error) {
-	return func(r *http.Request) (*books.CreateBookCoverPayload, error) {
-		var payload *books.CreateBookCoverPayload
-		var (
-			id  int64
-			err error
-
-			params = mux.Vars(r)
-		)
-		{
-			idRaw := params["id"]
-			v, err2 := strconv.ParseInt(idRaw, 10, 64)
-			if err2 != nil {
-				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("id", idRaw, "integer"))
-			}
-			id = v
+// EncodeCreateBookError returns an encoder for errors returned by the
+// createBook books endpoint.
+func EncodeCreateBookError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(ctx context.Context, err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		var en goa.GoaErrorNamer
+		if !errors.As(v, &en) {
+			return encodeError(ctx, w, v)
 		}
-		if err != nil {
-			return payload, err
+		switch en.GoaErrorName() {
+		case "conflict":
+			var res books.Conflict
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusConflict)
+			return enc.Encode(body)
+		case "internal_error":
+			var res books.InternalError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "invalid_input":
+			var res books.InvalidInput
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
 		}
-		payload = NewCreateBookCoverPayload(id)
-
-		return payload, nil
 	}
 }
 
@@ -302,23 +365,71 @@ func DecodeUpdateBookRequest(mux goahttp.Muxer, decoder func(*http.Request) goah
 	}
 }
 
-// EncodeUpdateBookCoverResponse returns an encoder for responses returned by
-// the books updateBookCover endpoint.
-func EncodeUpdateBookCoverResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
+// EncodeUpdateBookError returns an encoder for errors returned by the
+// updateBook books endpoint.
+func EncodeUpdateBookError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(ctx context.Context, err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		var en goa.GoaErrorNamer
+		if !errors.As(v, &en) {
+			return encodeError(ctx, w, v)
+		}
+		switch en.GoaErrorName() {
+		case "conflict":
+			var res books.Conflict
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusConflict)
+			return enc.Encode(body)
+		case "internal_error":
+			var res books.InternalError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "invalid_input":
+			var res books.InvalidInput
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "not_found":
+			var res books.NotFound
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeSetBookCoverResponse returns an encoder for responses returned by the
+// books setBookCover endpoint.
+func EncodeSetBookCoverResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
 	return func(ctx context.Context, w http.ResponseWriter, v any) error {
 		res, _ := v.(*books.Book)
 		enc := encoder(ctx, w)
-		body := NewUpdateBookCoverResponseBody(res)
+		body := NewSetBookCoverResponseBody(res)
 		w.WriteHeader(http.StatusOK)
 		return enc.Encode(body)
 	}
 }
 
-// DecodeUpdateBookCoverRequest returns a decoder for requests sent to the
-// books updateBookCover endpoint.
-func DecodeUpdateBookCoverRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (*books.UpdateBookCoverPayload, error) {
-	return func(r *http.Request) (*books.UpdateBookCoverPayload, error) {
-		var payload *books.UpdateBookCoverPayload
+// DecodeSetBookCoverRequest returns a decoder for requests sent to the books
+// setBookCover endpoint.
+func DecodeSetBookCoverRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (*books.SetBookCoverPayload, error) {
+	return func(r *http.Request) (*books.SetBookCoverPayload, error) {
+		var payload *books.SetBookCoverPayload
 		var (
 			id  int64
 			err error
@@ -336,9 +447,57 @@ func DecodeUpdateBookCoverRequest(mux goahttp.Muxer, decoder func(*http.Request)
 		if err != nil {
 			return payload, err
 		}
-		payload = NewUpdateBookCoverPayload(id)
+		payload = NewSetBookCoverPayload(id)
 
 		return payload, nil
+	}
+}
+
+// EncodeSetBookCoverError returns an encoder for errors returned by the
+// setBookCover books endpoint.
+func EncodeSetBookCoverError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(ctx context.Context, err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		var en goa.GoaErrorNamer
+		if !errors.As(v, &en) {
+			return encodeError(ctx, w, v)
+		}
+		switch en.GoaErrorName() {
+		case "internal_error":
+			var res books.InternalError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "invalid_image_format":
+			var res books.InvalidImageFormat
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "not_found":
+			var res books.NotFound
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "payload_too_large":
+			var res books.PayloadTooLarge
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusRequestEntityTooLarge)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
 	}
 }
 
@@ -376,6 +535,38 @@ func DecodeDeleteBookRequest(mux goahttp.Muxer, decoder func(*http.Request) goah
 		payload = NewDeleteBookPayload(id)
 
 		return payload, nil
+	}
+}
+
+// EncodeDeleteBookError returns an encoder for errors returned by the
+// deleteBook books endpoint.
+func EncodeDeleteBookError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(ctx context.Context, err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		var en goa.GoaErrorNamer
+		if !errors.As(v, &en) {
+			return encodeError(ctx, w, v)
+		}
+		switch en.GoaErrorName() {
+		case "internal_error":
+			var res books.InternalError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "not_found":
+			var res books.NotFound
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
 	}
 }
 

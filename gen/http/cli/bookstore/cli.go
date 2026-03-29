@@ -23,13 +23,13 @@ import (
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() []string {
 	return []string{
-		"books (get-books|get-book|create-book|create-book-cover|update-book|update-book-cover|delete-book)",
+		"books (get-books|get-book|create-book|update-book|set-book-cover|delete-book)",
 	}
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + " " + "books get-books --title \"2\" --author \"s\" --published-at \"1989-06-12\" --published-after \"1977-02-19\" --published-before \"1998-02-21\" --limit 6560947090283536242 --offset 1787844559683115142" + "\n" +
+	return os.Args[0] + " " + "books get-books --title \"gh\" --author \"tnv\" --published-at \"1988-10-06\" --published-after \"1995-02-16\" --published-before \"2004-06-03\" --limit 6325897615762823788 --offset 3500938087851868914" + "\n" +
 		""
 }
 
@@ -60,17 +60,13 @@ func ParseEndpoint(
 		booksCreateBookFlags    = flag.NewFlagSet("create-book", flag.ExitOnError)
 		booksCreateBookBodyFlag = booksCreateBookFlags.String("body", "REQUIRED", "")
 
-		booksCreateBookCoverFlags      = flag.NewFlagSet("create-book-cover", flag.ExitOnError)
-		booksCreateBookCoverIDFlag     = booksCreateBookCoverFlags.String("id", "REQUIRED", "ID of the book")
-		booksCreateBookCoverStreamFlag = booksCreateBookCoverFlags.String("stream", "REQUIRED", "path to file containing the streamed request body")
-
 		booksUpdateBookFlags    = flag.NewFlagSet("update-book", flag.ExitOnError)
 		booksUpdateBookBodyFlag = booksUpdateBookFlags.String("body", "REQUIRED", "")
 		booksUpdateBookIDFlag   = booksUpdateBookFlags.String("id", "REQUIRED", "ID of the book")
 
-		booksUpdateBookCoverFlags      = flag.NewFlagSet("update-book-cover", flag.ExitOnError)
-		booksUpdateBookCoverIDFlag     = booksUpdateBookCoverFlags.String("id", "REQUIRED", "ID of the book")
-		booksUpdateBookCoverStreamFlag = booksUpdateBookCoverFlags.String("stream", "REQUIRED", "path to file containing the streamed request body")
+		booksSetBookCoverFlags      = flag.NewFlagSet("set-book-cover", flag.ExitOnError)
+		booksSetBookCoverIDFlag     = booksSetBookCoverFlags.String("id", "REQUIRED", "ID of the book")
+		booksSetBookCoverStreamFlag = booksSetBookCoverFlags.String("stream", "REQUIRED", "path to file containing the streamed request body")
 
 		booksDeleteBookFlags  = flag.NewFlagSet("delete-book", flag.ExitOnError)
 		booksDeleteBookIDFlag = booksDeleteBookFlags.String("id", "REQUIRED", "ID of the book")
@@ -79,9 +75,8 @@ func ParseEndpoint(
 	booksGetBooksFlags.Usage = booksGetBooksUsage
 	booksGetBookFlags.Usage = booksGetBookUsage
 	booksCreateBookFlags.Usage = booksCreateBookUsage
-	booksCreateBookCoverFlags.Usage = booksCreateBookCoverUsage
 	booksUpdateBookFlags.Usage = booksUpdateBookUsage
-	booksUpdateBookCoverFlags.Usage = booksUpdateBookCoverUsage
+	booksSetBookCoverFlags.Usage = booksSetBookCoverUsage
 	booksDeleteBookFlags.Usage = booksDeleteBookUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
@@ -127,14 +122,11 @@ func ParseEndpoint(
 			case "create-book":
 				epf = booksCreateBookFlags
 
-			case "create-book-cover":
-				epf = booksCreateBookCoverFlags
-
 			case "update-book":
 				epf = booksUpdateBookFlags
 
-			case "update-book-cover":
-				epf = booksUpdateBookCoverFlags
+			case "set-book-cover":
+				epf = booksSetBookCoverFlags
 
 			case "delete-book":
 				epf = booksDeleteBookFlags
@@ -173,20 +165,14 @@ func ParseEndpoint(
 			case "create-book":
 				endpoint = c.CreateBook()
 				data, err = booksc.BuildCreateBookPayload(*booksCreateBookBodyFlag)
-			case "create-book-cover":
-				endpoint = c.CreateBookCover()
-				data, err = booksc.BuildCreateBookCoverPayload(*booksCreateBookCoverIDFlag)
-				if err == nil {
-					data, err = booksc.BuildCreateBookCoverStreamPayload(data, *booksCreateBookCoverStreamFlag)
-				}
 			case "update-book":
 				endpoint = c.UpdateBook()
 				data, err = booksc.BuildUpdateBookPayload(*booksUpdateBookBodyFlag, *booksUpdateBookIDFlag)
-			case "update-book-cover":
-				endpoint = c.UpdateBookCover()
-				data, err = booksc.BuildUpdateBookCoverPayload(*booksUpdateBookCoverIDFlag)
+			case "set-book-cover":
+				endpoint = c.SetBookCover()
+				data, err = booksc.BuildSetBookCoverPayload(*booksSetBookCoverIDFlag)
 				if err == nil {
-					data, err = booksc.BuildUpdateBookCoverStreamPayload(data, *booksUpdateBookCoverStreamFlag)
+					data, err = booksc.BuildSetBookCoverStreamPayload(data, *booksSetBookCoverStreamFlag)
 				}
 			case "delete-book":
 				endpoint = c.DeleteBook()
@@ -209,9 +195,8 @@ func booksUsage() {
 	fmt.Fprintln(os.Stderr, `    get-books: GetBooks implements getBooks.`)
 	fmt.Fprintln(os.Stderr, `    get-book: GetBook implements getBook.`)
 	fmt.Fprintln(os.Stderr, `    create-book: CreateBook implements createBook.`)
-	fmt.Fprintln(os.Stderr, `    create-book-cover: CreateBookCover implements createBookCover.`)
 	fmt.Fprintln(os.Stderr, `    update-book: UpdateBook implements updateBook.`)
-	fmt.Fprintln(os.Stderr, `    update-book-cover: UpdateBookCover implements updateBookCover.`)
+	fmt.Fprintln(os.Stderr, `    set-book-cover: SetBookCover implements setBookCover.`)
 	fmt.Fprintln(os.Stderr, `    delete-book: DeleteBook implements deleteBook.`)
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Additional help:")
@@ -225,8 +210,8 @@ func booksGetBooksUsage() {
 	fmt.Fprint(os.Stderr, " -published-at STRING")
 	fmt.Fprint(os.Stderr, " -published-after STRING")
 	fmt.Fprint(os.Stderr, " -published-before STRING")
-	fmt.Fprint(os.Stderr, " -limit INT64")
-	fmt.Fprint(os.Stderr, " -offset INT64")
+	fmt.Fprint(os.Stderr, " -limit UINT64")
+	fmt.Fprint(os.Stderr, " -offset UINT64")
 	fmt.Fprintln(os.Stderr)
 
 	// Description
@@ -239,12 +224,12 @@ func booksGetBooksUsage() {
 	fmt.Fprintln(os.Stderr, `    -published-at STRING: `)
 	fmt.Fprintln(os.Stderr, `    -published-after STRING: `)
 	fmt.Fprintln(os.Stderr, `    -published-before STRING: `)
-	fmt.Fprintln(os.Stderr, `    -limit INT64: `)
-	fmt.Fprintln(os.Stderr, `    -offset INT64: `)
+	fmt.Fprintln(os.Stderr, `    -limit UINT64: `)
+	fmt.Fprintln(os.Stderr, `    -offset UINT64: `)
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books get-books --title \"2\" --author \"s\" --published-at \"1989-06-12\" --published-after \"1977-02-19\" --published-before \"1998-02-21\" --limit 6560947090283536242 --offset 1787844559683115142")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books get-books --title \"gh\" --author \"tnv\" --published-at \"1988-10-06\" --published-after \"1995-02-16\" --published-before \"2004-06-03\" --limit 6325897615762823788 --offset 3500938087851868914")
 }
 
 func booksGetBookUsage() {
@@ -262,7 +247,7 @@ func booksGetBookUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books get-book --id 4069975744769470044")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books get-book --id 2926505384489231124")
 }
 
 func booksCreateBookUsage() {
@@ -280,27 +265,7 @@ func booksCreateBookUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books create-book --body '{\n      \"author\": \"Qui eaque sequi.\",\n      \"published_at\": \"2009-03-26\",\n      \"title\": \"Aliquam excepturi velit incidunt iste molestiae.\"\n   }'")
-}
-
-func booksCreateBookCoverUsage() {
-	// Header with flags
-	fmt.Fprintf(os.Stderr, "%s [flags] books create-book-cover", os.Args[0])
-	fmt.Fprint(os.Stderr, " -id INT64")
-	fmt.Fprint(os.Stderr, " -stream STRING")
-	fmt.Fprintln(os.Stderr)
-
-	// Description
-	fmt.Fprintln(os.Stderr)
-	fmt.Fprintln(os.Stderr, `CreateBookCover implements createBookCover.`)
-
-	// Flags list
-	fmt.Fprintln(os.Stderr, `    -id INT64: ID of the book`)
-	fmt.Fprintln(os.Stderr, `    -stream STRING: path to file containing the streamed request body`)
-
-	fmt.Fprintln(os.Stderr)
-	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books create-book-cover --id 4058910603185579377 --stream \"goa.png\"")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books create-book --body '{\n      \"author\": \"Eum velit quibusdam alias adipisci.\",\n      \"published_at\": \"2005-07-03\",\n      \"title\": \"Consequatur ipsum aut corrupti minus.\"\n   }'")
 }
 
 func booksUpdateBookUsage() {
@@ -320,19 +285,19 @@ func booksUpdateBookUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books update-book --body '{\n      \"author\": \"Aliquam aperiam.\",\n      \"published_at\": \"1993-02-06\",\n      \"title\": \"Ea aut sequi autem.\"\n   }' --id 9219056606765003559")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books update-book --body '{\n      \"author\": \"Aspernatur accusamus sint dignissimos quia consequatur ea.\",\n      \"published_at\": \"2010-04-24\",\n      \"title\": \"Ducimus doloribus.\"\n   }' --id 5270956565065754013")
 }
 
-func booksUpdateBookCoverUsage() {
+func booksSetBookCoverUsage() {
 	// Header with flags
-	fmt.Fprintf(os.Stderr, "%s [flags] books update-book-cover", os.Args[0])
+	fmt.Fprintf(os.Stderr, "%s [flags] books set-book-cover", os.Args[0])
 	fmt.Fprint(os.Stderr, " -id INT64")
 	fmt.Fprint(os.Stderr, " -stream STRING")
 	fmt.Fprintln(os.Stderr)
 
 	// Description
 	fmt.Fprintln(os.Stderr)
-	fmt.Fprintln(os.Stderr, `UpdateBookCover implements updateBookCover.`)
+	fmt.Fprintln(os.Stderr, `SetBookCover implements setBookCover.`)
 
 	// Flags list
 	fmt.Fprintln(os.Stderr, `    -id INT64: ID of the book`)
@@ -340,7 +305,7 @@ func booksUpdateBookCoverUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books update-book-cover --id 2796088275383525555 --stream \"goa.png\"")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books set-book-cover --id 1977736719779695197 --stream \"goa.png\"")
 }
 
 func booksDeleteBookUsage() {
@@ -358,5 +323,5 @@ func booksDeleteBookUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books delete-book --id 8087531362028977791")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books delete-book --id 7025038568542974860")
 }

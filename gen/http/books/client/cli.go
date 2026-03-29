@@ -75,23 +75,23 @@ func BuildGetBooksPayload(booksGetBooksTitle string, booksGetBooksAuthor string,
 			}
 		}
 	}
-	var limit *int64
+	var limit *uint64
 	{
 		if booksGetBooksLimit != "" {
-			val, err := strconv.ParseInt(booksGetBooksLimit, 10, 64)
+			val, err := strconv.ParseUint(booksGetBooksLimit, 10, 64)
 			limit = &val
 			if err != nil {
-				return nil, fmt.Errorf("invalid value for limit, must be INT64")
+				return nil, fmt.Errorf("invalid value for limit, must be UINT64")
 			}
 		}
 	}
-	var offset *int64
+	var offset *uint64
 	{
 		if booksGetBooksOffset != "" {
-			val, err := strconv.ParseInt(booksGetBooksOffset, 10, 64)
+			val, err := strconv.ParseUint(booksGetBooksOffset, 10, 64)
 			offset = &val
 			if err != nil {
-				return nil, fmt.Errorf("invalid value for offset, must be INT64")
+				return nil, fmt.Errorf("invalid value for offset, must be UINT64")
 			}
 		}
 	}
@@ -132,7 +132,7 @@ func BuildCreateBookPayload(booksCreateBookBody string) (*books.CreateBookPayloa
 	{
 		err = json.Unmarshal([]byte(booksCreateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"Qui eaque sequi.\",\n      \"published_at\": \"2009-03-26\",\n      \"title\": \"Aliquam excepturi velit incidunt iste molestiae.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"Eum velit quibusdam alias adipisci.\",\n      \"published_at\": \"2005-07-03\",\n      \"title\": \"Consequatur ipsum aut corrupti minus.\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.published_at", body.PublishedAt, goa.FormatDate))
 		if err != nil {
@@ -148,23 +148,6 @@ func BuildCreateBookPayload(booksCreateBookBody string) (*books.CreateBookPayloa
 	return v, nil
 }
 
-// BuildCreateBookCoverPayload builds the payload for the books createBookCover
-// endpoint from CLI flags.
-func BuildCreateBookCoverPayload(booksCreateBookCoverID string) (*books.CreateBookCoverPayload, error) {
-	var err error
-	var id int64
-	{
-		id, err = strconv.ParseInt(booksCreateBookCoverID, 10, 64)
-		if err != nil {
-			return nil, fmt.Errorf("invalid value for id, must be INT64")
-		}
-	}
-	v := &books.CreateBookCoverPayload{}
-	v.ID = id
-
-	return v, nil
-}
-
 // BuildUpdateBookPayload builds the payload for the books updateBook endpoint
 // from CLI flags.
 func BuildUpdateBookPayload(booksUpdateBookBody string, booksUpdateBookID string) (*books.UpdateBookPayload, error) {
@@ -173,7 +156,7 @@ func BuildUpdateBookPayload(booksUpdateBookBody string, booksUpdateBookID string
 	{
 		err = json.Unmarshal([]byte(booksUpdateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"Aliquam aperiam.\",\n      \"published_at\": \"1993-02-06\",\n      \"title\": \"Ea aut sequi autem.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"Aspernatur accusamus sint dignissimos quia consequatur ea.\",\n      \"published_at\": \"2010-04-24\",\n      \"title\": \"Ducimus doloribus.\"\n   }'")
 		}
 		if body.PublishedAt != nil {
 			err = goa.MergeErrors(err, goa.ValidateFormat("body.published_at", *body.PublishedAt, goa.FormatDate))
@@ -199,18 +182,18 @@ func BuildUpdateBookPayload(booksUpdateBookBody string, booksUpdateBookID string
 	return v, nil
 }
 
-// BuildUpdateBookCoverPayload builds the payload for the books updateBookCover
+// BuildSetBookCoverPayload builds the payload for the books setBookCover
 // endpoint from CLI flags.
-func BuildUpdateBookCoverPayload(booksUpdateBookCoverID string) (*books.UpdateBookCoverPayload, error) {
+func BuildSetBookCoverPayload(booksSetBookCoverID string) (*books.SetBookCoverPayload, error) {
 	var err error
 	var id int64
 	{
-		id, err = strconv.ParseInt(booksUpdateBookCoverID, 10, 64)
+		id, err = strconv.ParseInt(booksSetBookCoverID, 10, 64)
 		if err != nil {
 			return nil, fmt.Errorf("invalid value for id, must be INT64")
 		}
 	}
-	v := &books.UpdateBookCoverPayload{}
+	v := &books.SetBookCoverPayload{}
 	v.ID = id
 
 	return v, nil

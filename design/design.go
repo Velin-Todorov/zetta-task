@@ -12,6 +12,12 @@ var _ = API("bookstore", func() {
 
 var _ = Service("books", func() {
 	Description("Service that returns data about books")
+	Error("not_found", String, "Book not found")
+	Error("invalid_input", String, "Invalid input")
+	Error("invalid_image_format", String, "Unsupported image format")
+	Error("payload_too_large", String, "File size exceeds limit")
+	Error("conflict", String, "Book already exists")
+	Error("internal_error", String, "Internal server error")
 
 	Method("getBooks", func() {
 		Result(ArrayOf(Book))
@@ -31,8 +37,8 @@ var _ = Service("books", func() {
 			Attribute("published_before", String, func() {
 				Format(FormatDate)
 			})
-			Attribute("limit", Int64)
-			Attribute("offset", Int64)
+			Attribute("limit", UInt64)
+			Attribute("offset", UInt64)
 		})
 
 		HTTP(func() {
@@ -47,6 +53,8 @@ var _ = Service("books", func() {
 			Response(StatusOK, func() {
 				ContentType("application/json")
 			})
+			Response("not_found", StatusNotFound)
+			Response("internal_error", StatusInternalServerError)
 		})
 	})
 
@@ -61,6 +69,8 @@ var _ = Service("books", func() {
 			Response(StatusOK, func() {
 				ContentType("application/json")
 			})
+			Response("not_found", StatusNotFound)
+			Response("internal_error", StatusInternalServerError)
 		})
 	})
 
@@ -80,21 +90,9 @@ var _ = Service("books", func() {
 			Response(StatusCreated, func() {
 				ContentType("application/json")
 			})
-		})
-	})
-
-	Method("createBookCover", func() {
-		Payload(func() {
-			Attribute("id", Int64, "ID of the book")
-			Required("id")
-		})
-		Result(Book)
-		HTTP(func() {
-			POST("/books/{id}/cover")
-			SkipRequestBodyEncodeDecode()
-			Response(StatusCreated, func() {
-				ContentType("application/json")
-			})
+			Response("conflict", StatusConflict)
+			Response("invalid_input", StatusBadRequest)
+			Response("internal_error", StatusInternalServerError)
 		})
 	})
 
@@ -115,10 +113,14 @@ var _ = Service("books", func() {
 			Response(StatusOK, func() {
 				ContentType("application/json")
 			})
+			Response("not_found", StatusNotFound)
+			Response("conflict", StatusConflict)
+			Response("invalid_input", StatusBadRequest)
+			Response("internal_error", StatusInternalServerError)
 		})
 	})
 
-	Method("updateBookCover", func() {
+	Method("setBookCover", func() {
 		Payload(func() {
 			Attribute("id", Int64, "ID of the book")
 			Required("id")
@@ -128,6 +130,10 @@ var _ = Service("books", func() {
 			PUT("/books/{id}/cover")
 			SkipRequestBodyEncodeDecode()
 			Response(StatusOK)
+			Response("not_found", StatusNotFound)
+			Response("invalid_image_format", StatusBadRequest)
+			Response("payload_too_large", StatusRequestEntityTooLarge)
+			Response("internal_error", StatusInternalServerError)
 		})
 	})
 
@@ -139,6 +145,8 @@ var _ = Service("books", func() {
 		HTTP(func() {
 			DELETE("/books/{id}")
 			Response(StatusNoContent)
+			Response("not_found", StatusNotFound)
+			Response("internal_error", StatusInternalServerError)
 		})
 	})
 

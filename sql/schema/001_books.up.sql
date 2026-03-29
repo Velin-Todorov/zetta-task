@@ -5,3 +5,5 @@ CREATE TABLE `books` (
     cover_path VARCHAR(255),
     published_at DATE NOT NULL
 );
+
+CREATE UNIQUE INDEX title_author ON books (title, author);

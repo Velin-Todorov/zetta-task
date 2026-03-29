@@ -51,12 +51,10 @@ paths:
                   in: query
                   required: false
                   type: integer
-                  format: int64
                 - name: offset
                   in: query
                   required: false
                   type: integer
-                  format: int64
             responses:
                 "200":
                     description: OK response.
@@ -64,6 +62,14 @@ paths:
                         type: array
                         items:
                             $ref: '#/definitions/Book'
+                "404":
+                    description: Not Found response.
+                    schema:
+                        type: string
+                "500":
+                    description: Internal Server Error response.
+                    schema:
+                        type: string
             schemes:
                 - http
         post:
@@ -93,6 +99,18 @@ paths:
                             - title
                             - author
                             - published_at
+                "400":
+                    description: Bad Request response.
+                    schema:
+                        type: string
+                "409":
+                    description: Conflict response.
+                    schema:
+                        type: string
+                "500":
+                    description: Internal Server Error response.
+                    schema:
+                        type: string
             schemes:
                 - http
     /books/{id}:
@@ -120,6 +138,14 @@ paths:
                             - title
                             - author
                             - published_at
+                "404":
+                    description: Not Found response.
+                    schema:
+                        type: string
+                "500":
+                    description: Internal Server Error response.
+                    schema:
+                        type: string
             schemes:
                 - http
         delete:
@@ -137,6 +163,14 @@ paths:
             responses:
                 "204":
                     description: No Content response.
+                "404":
+                    description: Not Found response.
+                    schema:
+                        type: string
+                "500":
+                    description: Internal Server Error response.
+                    schema:
+                        type: string
             schemes:
                 - http
         patch:
@@ -168,14 +202,30 @@ paths:
                             - title
                             - author
                             - published_at
+                "400":
+                    description: Bad Request response.
+                    schema:
+                        type: string
+                "404":
+                    description: Not Found response.
+                    schema:
+                        type: string
+                "409":
+                    description: Conflict response.
+                    schema:
+                        type: string
+                "500":
+                    description: Internal Server Error response.
+                    schema:
+                        type: string
             schemes:
                 - http
     /books/{id}/cover:
         put:
             tags:
                 - books
-            summary: updateBookCover books
-            operationId: books#updateBookCover
+            summary: setBookCover books
+            operationId: books#setBookCover
             parameters:
                 - name: id
                   in: path
@@ -193,32 +243,22 @@ paths:
                             - title
                             - author
                             - published_at
-            schemes:
-                - http
-        post:
-            tags:
-                - books
-            summary: createBookCover books
-            operationId: books#createBookCover
-            produces:
-                - application/json
-            parameters:
-                - name: id
-                  in: path
-                  description: ID of the book
-                  required: true
-                  type: integer
-                  format: int64
-            responses:
-                "201":
-                    description: Created response.
+                "400":
+                    description: Bad Request response.
                     schema:
-                        $ref: '#/definitions/Book'
-                        required:
-                            - id
-                            - title
-                            - author
-                            - published_at
+                        type: string
+                "404":
+                    description: Not Found response.
+                    schema:
+                        type: string
+                "413":
+                    description: Request Entity Too Large response.
+                    schema:
+                        type: string
+                "500":
+                    description: Internal Server Error response.
+                    schema:
+                        type: string
             schemes:
                 - http
 definitions:
@@ -228,28 +268,28 @@ definitions:
         properties:
             author:
                 type: string
-                example: Et ducimus consectetur et voluptatem autem vel.
+                example: Quos officia est facere nihil qui.
             cover_url:
                 type: string
-                example: Recusandae dolores.
+                example: Dolore eum rerum eligendi reiciendis consequuntur.
             id:
                 type: integer
-                example: 7063541483181457008
+                example: 1987243621613679910
                 format: int64
             published_at:
                 type: string
-                example: "2008-11-03"
+                example: "2008-10-20"
                 format: date
             title:
                 type: string
-                example: Non eos et earum molestiae non.
+                example: Dolore animi qui dolor.
         description: A single book
         example:
-            author: Laboriosam libero autem voluptate vel.
-            cover_url: Omnis facere molestiae esse animi quaerat illo.
-            id: 5277320084172908325
-            published_at: "2005-07-17"
-            title: Et tempore dolores.
+            author: Cumque cupiditate nobis deleniti.
+            cover_url: Doloremque quo voluptatem aspernatur omnis quia.
+            id: 3815735839398449291
+            published_at: "2006-09-19"
+            title: Placeat sunt.
         required:
             - id
             - title
@@ -262,20 +302,20 @@ definitions:
             author:
                 type: string
                 description: Author of the book
-                example: Natus sit cupiditate.
+                example: Ut deleniti facere iste nostrum.
             published_at:
                 type: string
                 description: Publication time of the book
-                example: "1998-03-14"
+                example: "1996-08-29"
                 format: date
             title:
                 type: string
                 description: Title of the book
-                example: Dicta illum non maxime et.
+                example: Quod quia.
         example:
-            author: Ullam consequuntur omnis.
-            published_at: "1985-07-05"
-            title: Aspernatur voluptas aliquam deserunt et.
+            author: Est vel eum facere deserunt molestiae.
+            published_at: "2008-04-15"
+            title: Corrupti alias dolorum.
         required:
             - title
             - author
@@ -287,17 +327,17 @@ definitions:
             author:
                 type: string
                 description: Author of the book
-                example: Fugiat velit et inventore.
+                example: Aspernatur sunt optio quia.
             published_at:
                 type: string
                 description: Publication time of the book
-                example: "1999-05-06"
+                example: "1988-02-10"
                 format: date
             title:
                 type: string
                 description: Title of the book
-                example: Fugit illum eum consequatur tempore.
+                example: Iste quibusdam quia et qui.
         example:
-            author: Nihil ut inventore dolore et saepe at.
-            published_at: "1977-03-12"
-            title: Et error saepe.
+            author: Repellendus et id libero ad aut facere.
+            published_at: "1974-05-25"
+            title: Velit hic illum voluptas.

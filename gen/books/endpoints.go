@@ -16,29 +16,19 @@ import (
 
 // Endpoints wraps the "books" service endpoints.
 type Endpoints struct {
-	GetBooks        goa.Endpoint
-	GetBook         goa.Endpoint
-	CreateBook      goa.Endpoint
-	CreateBookCover goa.Endpoint
-	UpdateBook      goa.Endpoint
-	UpdateBookCover goa.Endpoint
-	DeleteBook      goa.Endpoint
+	GetBooks     goa.Endpoint
+	GetBook      goa.Endpoint
+	CreateBook   goa.Endpoint
+	UpdateBook   goa.Endpoint
+	SetBookCover goa.Endpoint
+	DeleteBook   goa.Endpoint
 }
 
-// CreateBookCoverRequestData holds both the payload and the HTTP request body
-// reader of the "createBookCover" method.
-type CreateBookCoverRequestData struct {
+// SetBookCoverRequestData holds both the payload and the HTTP request body
+// reader of the "setBookCover" method.
+type SetBookCoverRequestData struct {
 	// Payload is the method payload.
-	Payload *CreateBookCoverPayload
-	// Body streams the HTTP request body.
-	Body io.ReadCloser
-}
-
-// UpdateBookCoverRequestData holds both the payload and the HTTP request body
-// reader of the "updateBookCover" method.
-type UpdateBookCoverRequestData struct {
-	// Payload is the method payload.
-	Payload *UpdateBookCoverPayload
+	Payload *SetBookCoverPayload
 	// Body streams the HTTP request body.
 	Body io.ReadCloser
 }
@@ -46,13 +36,12 @@ type UpdateBookCoverRequestData struct {
 // NewEndpoints wraps the methods of the "books" service with endpoints.
 func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
-		GetBooks:        NewGetBooksEndpoint(s),
-		GetBook:         NewGetBookEndpoint(s),
-		CreateBook:      NewCreateBookEndpoint(s),
-		CreateBookCover: NewCreateBookCoverEndpoint(s),
-		UpdateBook:      NewUpdateBookEndpoint(s),
-		UpdateBookCover: NewUpdateBookCoverEndpoint(s),
-		DeleteBook:      NewDeleteBookEndpoint(s),
+		GetBooks:     NewGetBooksEndpoint(s),
+		GetBook:      NewGetBookEndpoint(s),
+		CreateBook:   NewCreateBookEndpoint(s),
+		UpdateBook:   NewUpdateBookEndpoint(s),
+		SetBookCover: NewSetBookCoverEndpoint(s),
+		DeleteBook:   NewDeleteBookEndpoint(s),
 	}
 }
 
@@ -61,9 +50,8 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.GetBooks = m(e.GetBooks)
 	e.GetBook = m(e.GetBook)
 	e.CreateBook = m(e.CreateBook)
-	e.CreateBookCover = m(e.CreateBookCover)
 	e.UpdateBook = m(e.UpdateBook)
-	e.UpdateBookCover = m(e.UpdateBookCover)
+	e.SetBookCover = m(e.SetBookCover)
 	e.DeleteBook = m(e.DeleteBook)
 }
 
@@ -94,15 +82,6 @@ func NewCreateBookEndpoint(s Service) goa.Endpoint {
 	}
 }
 
-// NewCreateBookCoverEndpoint returns an endpoint function that calls the
-// method "createBookCover" of service "books".
-func NewCreateBookCoverEndpoint(s Service) goa.Endpoint {
-	return func(ctx context.Context, req any) (any, error) {
-		ep := req.(*CreateBookCoverRequestData)
-		return s.CreateBookCover(ctx, ep.Payload, ep.Body)
-	}
-}
-
 // NewUpdateBookEndpoint returns an endpoint function that calls the method
 // "updateBook" of service "books".
 func NewUpdateBookEndpoint(s Service) goa.Endpoint {
@@ -112,12 +91,12 @@ func NewUpdateBookEndpoint(s Service) goa.Endpoint {
 	}
 }
 
-// NewUpdateBookCoverEndpoint returns an endpoint function that calls the
-// method "updateBookCover" of service "books".
-func NewUpdateBookCoverEndpoint(s Service) goa.Endpoint {
+// NewSetBookCoverEndpoint returns an endpoint function that calls the method
+// "setBookCover" of service "books".
+func NewSetBookCoverEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
-		ep := req.(*UpdateBookCoverRequestData)
-		return s.UpdateBookCover(ctx, ep.Payload, ep.Body)
+		ep := req.(*SetBookCoverRequestData)
+		return s.SetBookCover(ctx, ep.Payload, ep.Body)
 	}
 }
 

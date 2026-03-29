@@ -3,11 +3,14 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/go-sql-driver/mysql"
 
 	"github.com/Velin-Todorov/zetta-task/internal/db"
 )
+
 
 type mysqlBookRepository struct {
 	queries *db.Queries
@@ -135,3 +138,12 @@ func NewMySQLBookRepository(database *sql.DB) BookRepository {
 		db:      database,
 	}
 }
+
+func wrapMySQLError(err error) error {
+    var mysqlErr *mysql.MySQLError
+    if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
+        return ErrConflict
+    }
+    return err
+}
+

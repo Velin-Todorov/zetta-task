@@ -58,16 +58,6 @@ type CreateBookResponseBody struct {
 	PublishedAt string  `form:"published_at" json:"published_at" xml:"published_at"`
 }
 
-// CreateBookCoverResponseBody is the type of the "books" service
-// "createBookCover" endpoint HTTP response body.
-type CreateBookCoverResponseBody struct {
-	ID          int64   `form:"id" json:"id" xml:"id"`
-	Title       string  `form:"title" json:"title" xml:"title"`
-	Author      string  `form:"author" json:"author" xml:"author"`
-	CoverURL    *string `form:"cover_url,omitempty" json:"cover_url,omitempty" xml:"cover_url,omitempty"`
-	PublishedAt string  `form:"published_at" json:"published_at" xml:"published_at"`
-}
-
 // UpdateBookResponseBody is the type of the "books" service "updateBook"
 // endpoint HTTP response body.
 type UpdateBookResponseBody struct {
@@ -78,9 +68,9 @@ type UpdateBookResponseBody struct {
 	PublishedAt string  `form:"published_at" json:"published_at" xml:"published_at"`
 }
 
-// UpdateBookCoverResponseBody is the type of the "books" service
-// "updateBookCover" endpoint HTTP response body.
-type UpdateBookCoverResponseBody struct {
+// SetBookCoverResponseBody is the type of the "books" service "setBookCover"
+// endpoint HTTP response body.
+type SetBookCoverResponseBody struct {
 	ID          int64   `form:"id" json:"id" xml:"id"`
 	Title       string  `form:"title" json:"title" xml:"title"`
 	Author      string  `form:"author" json:"author" xml:"author"`
@@ -137,19 +127,6 @@ func NewCreateBookResponseBody(res *books.Book) *CreateBookResponseBody {
 	return body
 }
 
-// NewCreateBookCoverResponseBody builds the HTTP response body from the result
-// of the "createBookCover" endpoint of the "books" service.
-func NewCreateBookCoverResponseBody(res *books.Book) *CreateBookCoverResponseBody {
-	body := &CreateBookCoverResponseBody{
-		ID:          res.ID,
-		Title:       res.Title,
-		Author:      res.Author,
-		CoverURL:    res.CoverURL,
-		PublishedAt: res.PublishedAt,
-	}
-	return body
-}
-
 // NewUpdateBookResponseBody builds the HTTP response body from the result of
 // the "updateBook" endpoint of the "books" service.
 func NewUpdateBookResponseBody(res *books.Book) *UpdateBookResponseBody {
@@ -163,10 +140,10 @@ func NewUpdateBookResponseBody(res *books.Book) *UpdateBookResponseBody {
 	return body
 }
 
-// NewUpdateBookCoverResponseBody builds the HTTP response body from the result
-// of the "updateBookCover" endpoint of the "books" service.
-func NewUpdateBookCoverResponseBody(res *books.Book) *UpdateBookCoverResponseBody {
-	body := &UpdateBookCoverResponseBody{
+// NewSetBookCoverResponseBody builds the HTTP response body from the result of
+// the "setBookCover" endpoint of the "books" service.
+func NewSetBookCoverResponseBody(res *books.Book) *SetBookCoverResponseBody {
+	body := &SetBookCoverResponseBody{
 		ID:          res.ID,
 		Title:       res.Title,
 		Author:      res.Author,
@@ -177,7 +154,7 @@ func NewUpdateBookCoverResponseBody(res *books.Book) *UpdateBookCoverResponseBod
 }
 
 // NewGetBooksPayload builds a books service getBooks endpoint payload.
-func NewGetBooksPayload(title *string, author *string, publishedAt *string, publishedAfter *string, publishedBefore *string, limit *int64, offset *int64) *books.GetBooksPayload {
+func NewGetBooksPayload(title *string, author *string, publishedAt *string, publishedAfter *string, publishedBefore *string, limit *uint64, offset *uint64) *books.GetBooksPayload {
 	v := &books.GetBooksPayload{}
 	v.Title = title
 	v.Author = author
@@ -209,15 +186,6 @@ func NewCreateBookPayload(body *CreateBookRequestBody) *books.CreateBookPayload 
 	return v
 }
 
-// NewCreateBookCoverPayload builds a books service createBookCover endpoint
-// payload.
-func NewCreateBookCoverPayload(id int64) *books.CreateBookCoverPayload {
-	v := &books.CreateBookCoverPayload{}
-	v.ID = id
-
-	return v
-}
-
 // NewUpdateBookPayload builds a books service updateBook endpoint payload.
 func NewUpdateBookPayload(body *UpdateBookRequestBody, id int64) *books.UpdateBookPayload {
 	v := &books.UpdateBookPayload{
@@ -230,10 +198,9 @@ func NewUpdateBookPayload(body *UpdateBookRequestBody, id int64) *books.UpdateBo
 	return v
 }
 
-// NewUpdateBookCoverPayload builds a books service updateBookCover endpoint
-// payload.
-func NewUpdateBookCoverPayload(id int64) *books.UpdateBookCoverPayload {
-	v := &books.UpdateBookCoverPayload{}
+// NewSetBookCoverPayload builds a books service setBookCover endpoint payload.
+func NewSetBookCoverPayload(id int64) *books.SetBookCoverPayload {
+	v := &books.SetBookCoverPayload{}
 	v.ID = id
 
 	return v

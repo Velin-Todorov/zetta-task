@@ -74,6 +74,10 @@ func EncodeGetBooksRequest(encoder func(*http.Request) goahttp.Encoder) func(*ht
 // DecodeGetBooksResponse returns a decoder for responses returned by the books
 // getBooks endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
+// DecodeGetBooksResponse may return the following errors:
+//   - "internal_error" (type books.InternalError): http.StatusInternalServerError
+//   - "not_found" (type books.NotFound): http.StatusNotFound
+//   - error: internal error
 func DecodeGetBooksResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
 		if restoreBody {
@@ -110,6 +114,26 @@ func DecodeGetBooksResponse(decoder func(*http.Response) goahttp.Decoder, restor
 			}
 			res := NewGetBooksBookOK(body)
 			return res, nil
+		case http.StatusInternalServerError:
+			var (
+				body string
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("books", "getBooks", err)
+			}
+			return nil, NewGetBooksInternalError(body)
+		case http.StatusNotFound:
+			var (
+				body string
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("books", "getBooks", err)
+			}
+			return nil, NewGetBooksNotFound(body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("books", "getBooks", resp.StatusCode, string(body))
@@ -145,6 +169,10 @@ func (c *Client) BuildGetBookRequest(ctx context.Context, v any) (*http.Request,
 // DecodeGetBookResponse returns a decoder for responses returned by the books
 // getBook endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
+// DecodeGetBookResponse may return the following errors:
+//   - "internal_error" (type books.InternalError): http.StatusInternalServerError
+//   - "not_found" (type books.NotFound): http.StatusNotFound
+//   - error: internal error
 func DecodeGetBookResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
 		if restoreBody {
@@ -175,6 +203,26 @@ func DecodeGetBookResponse(decoder func(*http.Response) goahttp.Decoder, restore
 			}
 			res := NewGetBookBookOK(&body)
 			return res, nil
+		case http.StatusInternalServerError:
+			var (
+				body string
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("books", "getBook", err)
+			}
+			return nil, NewGetBookInternalError(body)
+		case http.StatusNotFound:
+			var (
+				body string
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("books", "getBook", err)
+			}
+			return nil, NewGetBookNotFound(body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("books", "getBook", resp.StatusCode, string(body))
@@ -216,6 +264,11 @@ func EncodeCreateBookRequest(encoder func(*http.Request) goahttp.Encoder) func(*
 // DecodeCreateBookResponse returns a decoder for responses returned by the
 // books createBook endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
+// DecodeCreateBookResponse may return the following errors:
+//   - "conflict" (type books.Conflict): http.StatusConflict
+//   - "internal_error" (type books.InternalError): http.StatusInternalServerError
+//   - "invalid_input" (type books.InvalidInput): http.StatusBadRequest
+//   - error: internal error
 func DecodeCreateBookResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
 		if restoreBody {
@@ -246,92 +299,41 @@ func DecodeCreateBookResponse(decoder func(*http.Response) goahttp.Decoder, rest
 			}
 			res := NewCreateBookBookCreated(&body)
 			return res, nil
+		case http.StatusConflict:
+			var (
+				body string
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("books", "createBook", err)
+			}
+			return nil, NewCreateBookConflict(body)
+		case http.StatusInternalServerError:
+			var (
+				body string
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("books", "createBook", err)
+			}
+			return nil, NewCreateBookInternalError(body)
+		case http.StatusBadRequest:
+			var (
+				body string
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("books", "createBook", err)
+			}
+			return nil, NewCreateBookInvalidInput(body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("books", "createBook", resp.StatusCode, string(body))
 		}
 	}
-}
-
-// BuildCreateBookCoverRequest instantiates a HTTP request object with method
-// and path set to call the "books" service "createBookCover" endpoint
-func (c *Client) BuildCreateBookCoverRequest(ctx context.Context, v any) (*http.Request, error) {
-	var (
-		id   int64
-		body io.Reader
-	)
-	{
-		rd, ok := v.(*books.CreateBookCoverRequestData)
-		if !ok {
-			return nil, goahttp.ErrInvalidType("books", "createBookCover", "books.CreateBookCoverRequestData", v)
-		}
-		p := rd.Payload
-		body = rd.Body
-		id = p.ID
-	}
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: CreateBookCoverBooksPath(id)}
-	req, err := http.NewRequest("POST", u.String(), body)
-	if err != nil {
-		return nil, goahttp.ErrInvalidURL("books", "createBookCover", u.String(), err)
-	}
-	if ctx != nil {
-		req = req.WithContext(ctx)
-	}
-
-	return req, nil
-}
-
-// DecodeCreateBookCoverResponse returns a decoder for responses returned by
-// the books createBookCover endpoint. restoreBody controls whether the
-// response body should be restored after having been read.
-func DecodeCreateBookCoverResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
-	return func(resp *http.Response) (any, error) {
-		if restoreBody {
-			b, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return nil, err
-			}
-			resp.Body = io.NopCloser(bytes.NewBuffer(b))
-			defer func() {
-				resp.Body = io.NopCloser(bytes.NewBuffer(b))
-			}()
-		} else {
-			defer resp.Body.Close()
-		}
-		switch resp.StatusCode {
-		case http.StatusCreated:
-			var (
-				body CreateBookCoverResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("books", "createBookCover", err)
-			}
-			err = ValidateCreateBookCoverResponseBody(&body)
-			if err != nil {
-				return nil, goahttp.ErrValidationError("books", "createBookCover", err)
-			}
-			res := NewCreateBookCoverBookCreated(&body)
-			return res, nil
-		default:
-			body, _ := io.ReadAll(resp.Body)
-			return nil, goahttp.ErrInvalidResponse("books", "createBookCover", resp.StatusCode, string(body))
-		}
-	}
-}
-
-// // BuildCreateBookCoverStreamPayload creates a streaming endpoint request
-// payload from the method payload and the path to the file to be streamed
-func BuildCreateBookCoverStreamPayload(payload any, fpath string) (*books.CreateBookCoverRequestData, error) {
-	f, err := os.Open(fpath)
-	if err != nil {
-		return nil, err
-	}
-	return &books.CreateBookCoverRequestData{
-		Payload: payload.(*books.CreateBookCoverPayload),
-		Body:    f,
-	}, nil
 }
 
 // BuildUpdateBookRequest instantiates a HTTP request object with method and
@@ -378,6 +380,12 @@ func EncodeUpdateBookRequest(encoder func(*http.Request) goahttp.Encoder) func(*
 // DecodeUpdateBookResponse returns a decoder for responses returned by the
 // books updateBook endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
+// DecodeUpdateBookResponse may return the following errors:
+//   - "conflict" (type books.Conflict): http.StatusConflict
+//   - "internal_error" (type books.InternalError): http.StatusInternalServerError
+//   - "invalid_input" (type books.InvalidInput): http.StatusBadRequest
+//   - "not_found" (type books.NotFound): http.StatusNotFound
+//   - error: internal error
 func DecodeUpdateBookResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
 		if restoreBody {
@@ -408,6 +416,46 @@ func DecodeUpdateBookResponse(decoder func(*http.Response) goahttp.Decoder, rest
 			}
 			res := NewUpdateBookBookOK(&body)
 			return res, nil
+		case http.StatusConflict:
+			var (
+				body string
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("books", "updateBook", err)
+			}
+			return nil, NewUpdateBookConflict(body)
+		case http.StatusInternalServerError:
+			var (
+				body string
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("books", "updateBook", err)
+			}
+			return nil, NewUpdateBookInternalError(body)
+		case http.StatusBadRequest:
+			var (
+				body string
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("books", "updateBook", err)
+			}
+			return nil, NewUpdateBookInvalidInput(body)
+		case http.StatusNotFound:
+			var (
+				body string
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("books", "updateBook", err)
+			}
+			return nil, NewUpdateBookNotFound(body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("books", "updateBook", resp.StatusCode, string(body))
@@ -415,26 +463,26 @@ func DecodeUpdateBookResponse(decoder func(*http.Response) goahttp.Decoder, rest
 	}
 }
 
-// BuildUpdateBookCoverRequest instantiates a HTTP request object with method
-// and path set to call the "books" service "updateBookCover" endpoint
-func (c *Client) BuildUpdateBookCoverRequest(ctx context.Context, v any) (*http.Request, error) {
+// BuildSetBookCoverRequest instantiates a HTTP request object with method and
+// path set to call the "books" service "setBookCover" endpoint
+func (c *Client) BuildSetBookCoverRequest(ctx context.Context, v any) (*http.Request, error) {
 	var (
 		id   int64
 		body io.Reader
 	)
 	{
-		rd, ok := v.(*books.UpdateBookCoverRequestData)
+		rd, ok := v.(*books.SetBookCoverRequestData)
 		if !ok {
-			return nil, goahttp.ErrInvalidType("books", "updateBookCover", "books.UpdateBookCoverRequestData", v)
+			return nil, goahttp.ErrInvalidType("books", "setBookCover", "books.SetBookCoverRequestData", v)
 		}
 		p := rd.Payload
 		body = rd.Body
 		id = p.ID
 	}
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: UpdateBookCoverBooksPath(id)}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: SetBookCoverBooksPath(id)}
 	req, err := http.NewRequest("PUT", u.String(), body)
 	if err != nil {
-		return nil, goahttp.ErrInvalidURL("books", "updateBookCover", u.String(), err)
+		return nil, goahttp.ErrInvalidURL("books", "setBookCover", u.String(), err)
 	}
 	if ctx != nil {
 		req = req.WithContext(ctx)
@@ -443,10 +491,16 @@ func (c *Client) BuildUpdateBookCoverRequest(ctx context.Context, v any) (*http.
 	return req, nil
 }
 
-// DecodeUpdateBookCoverResponse returns a decoder for responses returned by
-// the books updateBookCover endpoint. restoreBody controls whether the
-// response body should be restored after having been read.
-func DecodeUpdateBookCoverResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+// DecodeSetBookCoverResponse returns a decoder for responses returned by the
+// books setBookCover endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeSetBookCoverResponse may return the following errors:
+//   - "internal_error" (type books.InternalError): http.StatusInternalServerError
+//   - "invalid_image_format" (type books.InvalidImageFormat): http.StatusBadRequest
+//   - "not_found" (type books.NotFound): http.StatusNotFound
+//   - "payload_too_large" (type books.PayloadTooLarge): http.StatusRequestEntityTooLarge
+//   - error: internal error
+func DecodeSetBookCoverResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
 		if restoreBody {
 			b, err := io.ReadAll(resp.Body)
@@ -463,35 +517,75 @@ func DecodeUpdateBookCoverResponse(decoder func(*http.Response) goahttp.Decoder,
 		switch resp.StatusCode {
 		case http.StatusOK:
 			var (
-				body UpdateBookCoverResponseBody
+				body SetBookCoverResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("books", "updateBookCover", err)
+				return nil, goahttp.ErrDecodingError("books", "setBookCover", err)
 			}
-			err = ValidateUpdateBookCoverResponseBody(&body)
+			err = ValidateSetBookCoverResponseBody(&body)
 			if err != nil {
-				return nil, goahttp.ErrValidationError("books", "updateBookCover", err)
+				return nil, goahttp.ErrValidationError("books", "setBookCover", err)
 			}
-			res := NewUpdateBookCoverBookOK(&body)
+			res := NewSetBookCoverBookOK(&body)
 			return res, nil
+		case http.StatusInternalServerError:
+			var (
+				body string
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("books", "setBookCover", err)
+			}
+			return nil, NewSetBookCoverInternalError(body)
+		case http.StatusBadRequest:
+			var (
+				body string
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("books", "setBookCover", err)
+			}
+			return nil, NewSetBookCoverInvalidImageFormat(body)
+		case http.StatusNotFound:
+			var (
+				body string
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("books", "setBookCover", err)
+			}
+			return nil, NewSetBookCoverNotFound(body)
+		case http.StatusRequestEntityTooLarge:
+			var (
+				body string
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("books", "setBookCover", err)
+			}
+			return nil, NewSetBookCoverPayloadTooLarge(body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
-			return nil, goahttp.ErrInvalidResponse("books", "updateBookCover", resp.StatusCode, string(body))
+			return nil, goahttp.ErrInvalidResponse("books", "setBookCover", resp.StatusCode, string(body))
 		}
 	}
 }
 
-// // BuildUpdateBookCoverStreamPayload creates a streaming endpoint request
-// payload from the method payload and the path to the file to be streamed
-func BuildUpdateBookCoverStreamPayload(payload any, fpath string) (*books.UpdateBookCoverRequestData, error) {
+// // BuildSetBookCoverStreamPayload creates a streaming endpoint request payload
+// from the method payload and the path to the file to be streamed
+func BuildSetBookCoverStreamPayload(payload any, fpath string) (*books.SetBookCoverRequestData, error) {
 	f, err := os.Open(fpath)
 	if err != nil {
 		return nil, err
 	}
-	return &books.UpdateBookCoverRequestData{
-		Payload: payload.(*books.UpdateBookCoverPayload),
+	return &books.SetBookCoverRequestData{
+		Payload: payload.(*books.SetBookCoverPayload),
 		Body:    f,
 	}, nil
 }
@@ -524,6 +618,10 @@ func (c *Client) BuildDeleteBookRequest(ctx context.Context, v any) (*http.Reque
 // DecodeDeleteBookResponse returns a decoder for responses returned by the
 // books deleteBook endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
+// DecodeDeleteBookResponse may return the following errors:
+//   - "internal_error" (type books.InternalError): http.StatusInternalServerError
+//   - "not_found" (type books.NotFound): http.StatusNotFound
+//   - error: internal error
 func DecodeDeleteBookResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
 		if restoreBody {
@@ -541,6 +639,26 @@ func DecodeDeleteBookResponse(decoder func(*http.Response) goahttp.Decoder, rest
 		switch resp.StatusCode {
 		case http.StatusNoContent:
 			return nil, nil
+		case http.StatusInternalServerError:
+			var (
+				body string
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("books", "deleteBook", err)
+			}
+			return nil, NewDeleteBookInternalError(body)
+		case http.StatusNotFound:
+			var (
+				body string
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("books", "deleteBook", err)
+			}
+			return nil, NewDeleteBookNotFound(body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("books", "deleteBook", resp.StatusCode, string(body))

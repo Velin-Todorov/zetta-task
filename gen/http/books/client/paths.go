@@ -26,18 +26,13 @@ func CreateBookBooksPath() string {
 	return "/books"
 }
 
-// CreateBookCoverBooksPath returns the URL path to the books service createBookCover HTTP endpoint.
-func CreateBookCoverBooksPath(id int64) string {
-	return fmt.Sprintf("/books/%v/cover", id)
-}
-
 // UpdateBookBooksPath returns the URL path to the books service updateBook HTTP endpoint.
 func UpdateBookBooksPath(id int64) string {
 	return fmt.Sprintf("/books/%v", id)
 }
 
-// UpdateBookCoverBooksPath returns the URL path to the books service updateBookCover HTTP endpoint.
-func UpdateBookCoverBooksPath(id int64) string {
+// SetBookCoverBooksPath returns the URL path to the books service setBookCover HTTP endpoint.
+func SetBookCoverBooksPath(id int64) string {
 	return fmt.Sprintf("/books/%v/cover", id)
 }
 

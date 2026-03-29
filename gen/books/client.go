@@ -16,29 +16,35 @@ import (
 
 // Client is the "books" service client.
 type Client struct {
-	GetBooksEndpoint        goa.Endpoint
-	GetBookEndpoint         goa.Endpoint
-	CreateBookEndpoint      goa.Endpoint
-	CreateBookCoverEndpoint goa.Endpoint
-	UpdateBookEndpoint      goa.Endpoint
-	UpdateBookCoverEndpoint goa.Endpoint
-	DeleteBookEndpoint      goa.Endpoint
+	GetBooksEndpoint     goa.Endpoint
+	GetBookEndpoint      goa.Endpoint
+	CreateBookEndpoint   goa.Endpoint
+	UpdateBookEndpoint   goa.Endpoint
+	SetBookCoverEndpoint goa.Endpoint
+	DeleteBookEndpoint   goa.Endpoint
 }
 
 // NewClient initializes a "books" service client given the endpoints.
-func NewClient(getBooks, getBook, createBook, createBookCover, updateBook, updateBookCover, deleteBook goa.Endpoint) *Client {
+func NewClient(getBooks, getBook, createBook, updateBook, setBookCover, deleteBook goa.Endpoint) *Client {
 	return &Client{
-		GetBooksEndpoint:        getBooks,
-		GetBookEndpoint:         getBook,
-		CreateBookEndpoint:      createBook,
-		CreateBookCoverEndpoint: createBookCover,
-		UpdateBookEndpoint:      updateBook,
-		UpdateBookCoverEndpoint: updateBookCover,
-		DeleteBookEndpoint:      deleteBook,
+		GetBooksEndpoint:     getBooks,
+		GetBookEndpoint:      getBook,
+		CreateBookEndpoint:   createBook,
+		UpdateBookEndpoint:   updateBook,
+		SetBookCoverEndpoint: setBookCover,
+		DeleteBookEndpoint:   deleteBook,
 	}
 }
 
 // GetBooks calls the "getBooks" endpoint of the "books" service.
+// GetBooks may return the following errors:
+//   - "not_found" (type NotFound)
+//   - "invalid_input" (type InvalidInput)
+//   - "invalid_image_format" (type InvalidImageFormat)
+//   - "payload_too_large" (type PayloadTooLarge)
+//   - "conflict" (type Conflict)
+//   - "internal_error" (type InternalError)
+//   - error: internal error
 func (c *Client) GetBooks(ctx context.Context, p *GetBooksPayload) (res []*Book, err error) {
 	var ires any
 	ires, err = c.GetBooksEndpoint(ctx, p)
@@ -49,6 +55,14 @@ func (c *Client) GetBooks(ctx context.Context, p *GetBooksPayload) (res []*Book,
 }
 
 // GetBook calls the "getBook" endpoint of the "books" service.
+// GetBook may return the following errors:
+//   - "not_found" (type NotFound)
+//   - "invalid_input" (type InvalidInput)
+//   - "invalid_image_format" (type InvalidImageFormat)
+//   - "payload_too_large" (type PayloadTooLarge)
+//   - "conflict" (type Conflict)
+//   - "internal_error" (type InternalError)
+//   - error: internal error
 func (c *Client) GetBook(ctx context.Context, p *GetBookPayload) (res *Book, err error) {
 	var ires any
 	ires, err = c.GetBookEndpoint(ctx, p)
@@ -59,6 +73,14 @@ func (c *Client) GetBook(ctx context.Context, p *GetBookPayload) (res *Book, err
 }
 
 // CreateBook calls the "createBook" endpoint of the "books" service.
+// CreateBook may return the following errors:
+//   - "not_found" (type NotFound)
+//   - "invalid_input" (type InvalidInput)
+//   - "invalid_image_format" (type InvalidImageFormat)
+//   - "payload_too_large" (type PayloadTooLarge)
+//   - "conflict" (type Conflict)
+//   - "internal_error" (type InternalError)
+//   - error: internal error
 func (c *Client) CreateBook(ctx context.Context, p *CreateBookPayload) (res *Book, err error) {
 	var ires any
 	ires, err = c.CreateBookEndpoint(ctx, p)
@@ -68,17 +90,15 @@ func (c *Client) CreateBook(ctx context.Context, p *CreateBookPayload) (res *Boo
 	return ires.(*Book), nil
 }
 
-// CreateBookCover calls the "createBookCover" endpoint of the "books" service.
-func (c *Client) CreateBookCover(ctx context.Context, p *CreateBookCoverPayload, req io.ReadCloser) (res *Book, err error) {
-	var ires any
-	ires, err = c.CreateBookCoverEndpoint(ctx, &CreateBookCoverRequestData{Payload: p, Body: req})
-	if err != nil {
-		return
-	}
-	return ires.(*Book), nil
-}
-
 // UpdateBook calls the "updateBook" endpoint of the "books" service.
+// UpdateBook may return the following errors:
+//   - "not_found" (type NotFound)
+//   - "invalid_input" (type InvalidInput)
+//   - "invalid_image_format" (type InvalidImageFormat)
+//   - "payload_too_large" (type PayloadTooLarge)
+//   - "conflict" (type Conflict)
+//   - "internal_error" (type InternalError)
+//   - error: internal error
 func (c *Client) UpdateBook(ctx context.Context, p *UpdateBookPayload) (res *Book, err error) {
 	var ires any
 	ires, err = c.UpdateBookEndpoint(ctx, p)
@@ -88,10 +108,18 @@ func (c *Client) UpdateBook(ctx context.Context, p *UpdateBookPayload) (res *Boo
 	return ires.(*Book), nil
 }
 
-// UpdateBookCover calls the "updateBookCover" endpoint of the "books" service.
-func (c *Client) UpdateBookCover(ctx context.Context, p *UpdateBookCoverPayload, req io.ReadCloser) (res *Book, err error) {
+// SetBookCover calls the "setBookCover" endpoint of the "books" service.
+// SetBookCover may return the following errors:
+//   - "not_found" (type NotFound)
+//   - "invalid_input" (type InvalidInput)
+//   - "invalid_image_format" (type InvalidImageFormat)
+//   - "payload_too_large" (type PayloadTooLarge)
+//   - "conflict" (type Conflict)
+//   - "internal_error" (type InternalError)
+//   - error: internal error
+func (c *Client) SetBookCover(ctx context.Context, p *SetBookCoverPayload, req io.ReadCloser) (res *Book, err error) {
 	var ires any
-	ires, err = c.UpdateBookCoverEndpoint(ctx, &UpdateBookCoverRequestData{Payload: p, Body: req})
+	ires, err = c.SetBookCoverEndpoint(ctx, &SetBookCoverRequestData{Payload: p, Body: req})
 	if err != nil {
 		return
 	}
@@ -99,6 +127,14 @@ func (c *Client) UpdateBookCover(ctx context.Context, p *UpdateBookCoverPayload,
 }
 
 // DeleteBook calls the "deleteBook" endpoint of the "books" service.
+// DeleteBook may return the following errors:
+//   - "not_found" (type NotFound)
+//   - "invalid_input" (type InvalidInput)
+//   - "invalid_image_format" (type InvalidImageFormat)
+//   - "payload_too_large" (type PayloadTooLarge)
+//   - "conflict" (type Conflict)
+//   - "internal_error" (type InternalError)
+//   - error: internal error
 func (c *Client) DeleteBook(ctx context.Context, p *DeleteBookPayload) (err error) {
 	_, err = c.DeleteBookEndpoint(ctx, p)
 	return

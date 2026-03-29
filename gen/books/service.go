@@ -20,12 +20,10 @@ type Service interface {
 	GetBook(context.Context, *GetBookPayload) (res *Book, err error)
 	// CreateBook implements createBook.
 	CreateBook(context.Context, *CreateBookPayload) (res *Book, err error)
-	// CreateBookCover implements createBookCover.
-	CreateBookCover(context.Context, *CreateBookCoverPayload, io.ReadCloser) (res *Book, err error)
 	// UpdateBook implements updateBook.
 	UpdateBook(context.Context, *UpdateBookPayload) (res *Book, err error)
-	// UpdateBookCover implements updateBookCover.
-	UpdateBookCover(context.Context, *UpdateBookCoverPayload, io.ReadCloser) (res *Book, err error)
+	// SetBookCover implements setBookCover.
+	SetBookCover(context.Context, *SetBookCoverPayload, io.ReadCloser) (res *Book, err error)
 	// DeleteBook implements deleteBook.
 	DeleteBook(context.Context, *DeleteBookPayload) (err error)
 }
@@ -44,7 +42,7 @@ const ServiceName = "books"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [7]string{"getBooks", "getBook", "createBook", "createBookCover", "updateBook", "updateBookCover", "deleteBook"}
+var MethodNames = [6]string{"getBooks", "getBook", "createBook", "updateBook", "setBookCover", "deleteBook"}
 
 // Book is the result type of the books service getBook method.
 type Book struct {
@@ -53,13 +51,6 @@ type Book struct {
 	Author      string
 	CoverURL    *string
 	PublishedAt string
-}
-
-// CreateBookCoverPayload is the payload type of the books service
-// createBookCover method.
-type CreateBookCoverPayload struct {
-	// ID of the book
-	ID int64
 }
 
 // CreateBookPayload is the payload type of the books service createBook method.
@@ -91,13 +82,13 @@ type GetBooksPayload struct {
 	PublishedAt     *string
 	PublishedAfter  *string
 	PublishedBefore *string
-	Limit           *int64
-	Offset          *int64
+	Limit           *uint64
+	Offset          *uint64
 }
 
-// UpdateBookCoverPayload is the payload type of the books service
-// updateBookCover method.
-type UpdateBookCoverPayload struct {
+// SetBookCoverPayload is the payload type of the books service setBookCover
+// method.
+type SetBookCoverPayload struct {
 	// ID of the book
 	ID int64
 }
@@ -112,4 +103,124 @@ type UpdateBookPayload struct {
 	Author *string
 	// Publication time of the book
 	PublishedAt *string
+}
+
+// Book already exists
+type Conflict string
+
+// Internal server error
+type InternalError string
+
+// Unsupported image format
+type InvalidImageFormat string
+
+// Invalid input
+type InvalidInput string
+
+// Book not found
+type NotFound string
+
+// File size exceeds limit
+type PayloadTooLarge string
+
+// Error returns an error description.
+func (e Conflict) Error() string {
+	return "Book already exists"
+}
+
+// ErrorName returns "conflict".
+//
+// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
+func (e Conflict) ErrorName() string {
+	return e.GoaErrorName()
+}
+
+// GoaErrorName returns "conflict".
+func (e Conflict) GoaErrorName() string {
+	return "conflict"
+}
+
+// Error returns an error description.
+func (e InternalError) Error() string {
+	return "Internal server error"
+}
+
+// ErrorName returns "internal_error".
+//
+// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
+func (e InternalError) ErrorName() string {
+	return e.GoaErrorName()
+}
+
+// GoaErrorName returns "internal_error".
+func (e InternalError) GoaErrorName() string {
+	return "internal_error"
+}
+
+// Error returns an error description.
+func (e InvalidImageFormat) Error() string {
+	return "Unsupported image format"
+}
+
+// ErrorName returns "invalid_image_format".
+//
+// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
+func (e InvalidImageFormat) ErrorName() string {
+	return e.GoaErrorName()
+}
+
+// GoaErrorName returns "invalid_image_format".
+func (e InvalidImageFormat) GoaErrorName() string {
+	return "invalid_image_format"
+}
+
+// Error returns an error description.
+func (e InvalidInput) Error() string {
+	return "Invalid input"
+}
+
+// ErrorName returns "invalid_input".
+//
+// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
+func (e InvalidInput) ErrorName() string {
+	return e.GoaErrorName()
+}
+
+// GoaErrorName returns "invalid_input".
+func (e InvalidInput) GoaErrorName() string {
+	return "invalid_input"
+}
+
+// Error returns an error description.
+func (e NotFound) Error() string {
+	return "Book not found"
+}
+
+// ErrorName returns "not_found".
+//
+// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
+func (e NotFound) ErrorName() string {
+	return e.GoaErrorName()
+}
+
+// GoaErrorName returns "not_found".
+func (e NotFound) GoaErrorName() string {
+	return "not_found"
+}
+
+// Error returns an error description.
+func (e PayloadTooLarge) Error() string {
+	return "File size exceeds limit"
+}
+
+// ErrorName returns "payload_too_large".
+//
+// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
+func (e PayloadTooLarge) ErrorName() string {
+	return e.GoaErrorName()
+}
+
+// GoaErrorName returns "payload_too_large".
+func (e PayloadTooLarge) GoaErrorName() string {
+	return "payload_too_large"
 }

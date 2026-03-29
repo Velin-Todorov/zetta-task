@@ -29,17 +29,13 @@ type Client struct {
 	// endpoint.
 	CreateBookDoer goahttp.Doer
 
-	// CreateBookCover Doer is the HTTP client used to make requests to the
-	// createBookCover endpoint.
-	CreateBookCoverDoer goahttp.Doer
-
 	// UpdateBook Doer is the HTTP client used to make requests to the updateBook
 	// endpoint.
 	UpdateBookDoer goahttp.Doer
 
-	// UpdateBookCover Doer is the HTTP client used to make requests to the
-	// updateBookCover endpoint.
-	UpdateBookCoverDoer goahttp.Doer
+	// SetBookCover Doer is the HTTP client used to make requests to the
+	// setBookCover endpoint.
+	SetBookCoverDoer goahttp.Doer
 
 	// DeleteBook Doer is the HTTP client used to make requests to the deleteBook
 	// endpoint.
@@ -68,9 +64,8 @@ func NewClient(
 		GetBooksDoer:        doer,
 		GetBookDoer:         doer,
 		CreateBookDoer:      doer,
-		CreateBookCoverDoer: doer,
 		UpdateBookDoer:      doer,
-		UpdateBookCoverDoer: doer,
+		SetBookCoverDoer:    doer,
 		DeleteBookDoer:      doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -147,25 +142,6 @@ func (c *Client) CreateBook() goa.Endpoint {
 	}
 }
 
-// CreateBookCover returns an endpoint that makes HTTP requests to the books
-// service createBookCover server.
-func (c *Client) CreateBookCover() goa.Endpoint {
-	var (
-		decodeResponse = DecodeCreateBookCoverResponse(c.decoder, c.RestoreResponseBody)
-	)
-	return func(ctx context.Context, v any) (any, error) {
-		req, err := c.BuildCreateBookCoverRequest(ctx, v)
-		if err != nil {
-			return nil, err
-		}
-		resp, err := c.CreateBookCoverDoer.Do(req)
-		if err != nil {
-			return nil, goahttp.ErrRequestError("books", "createBookCover", err)
-		}
-		return decodeResponse(resp)
-	}
-}
-
 // UpdateBook returns an endpoint that makes HTTP requests to the books service
 // updateBook server.
 func (c *Client) UpdateBook() goa.Endpoint {
@@ -190,20 +166,20 @@ func (c *Client) UpdateBook() goa.Endpoint {
 	}
 }
 
-// UpdateBookCover returns an endpoint that makes HTTP requests to the books
-// service updateBookCover server.
-func (c *Client) UpdateBookCover() goa.Endpoint {
+// SetBookCover returns an endpoint that makes HTTP requests to the books
+// service setBookCover server.
+func (c *Client) SetBookCover() goa.Endpoint {
 	var (
-		decodeResponse = DecodeUpdateBookCoverResponse(c.decoder, c.RestoreResponseBody)
+		decodeResponse = DecodeSetBookCoverResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v any) (any, error) {
-		req, err := c.BuildUpdateBookCoverRequest(ctx, v)
+		req, err := c.BuildSetBookCoverRequest(ctx, v)
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.UpdateBookCoverDoer.Do(req)
+		resp, err := c.SetBookCoverDoer.Do(req)
 		if err != nil {
-			return nil, goahttp.ErrRequestError("books", "updateBookCover", err)
+			return nil, goahttp.ErrRequestError("books", "setBookCover", err)
 		}
 		return decodeResponse(resp)
 	}

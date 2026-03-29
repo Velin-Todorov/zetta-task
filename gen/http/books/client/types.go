@@ -54,16 +54,6 @@ type CreateBookResponseBody struct {
 	PublishedAt *string `form:"published_at,omitempty" json:"published_at,omitempty" xml:"published_at,omitempty"`
 }
 
-// CreateBookCoverResponseBody is the type of the "books" service
-// "createBookCover" endpoint HTTP response body.
-type CreateBookCoverResponseBody struct {
-	ID          *int64  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Title       *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
-	Author      *string `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
-	CoverURL    *string `form:"cover_url,omitempty" json:"cover_url,omitempty" xml:"cover_url,omitempty"`
-	PublishedAt *string `form:"published_at,omitempty" json:"published_at,omitempty" xml:"published_at,omitempty"`
-}
-
 // UpdateBookResponseBody is the type of the "books" service "updateBook"
 // endpoint HTTP response body.
 type UpdateBookResponseBody struct {
@@ -74,9 +64,9 @@ type UpdateBookResponseBody struct {
 	PublishedAt *string `form:"published_at,omitempty" json:"published_at,omitempty" xml:"published_at,omitempty"`
 }
 
-// UpdateBookCoverResponseBody is the type of the "books" service
-// "updateBookCover" endpoint HTTP response body.
-type UpdateBookCoverResponseBody struct {
+// SetBookCoverResponseBody is the type of the "books" service "setBookCover"
+// endpoint HTTP response body.
+type SetBookCoverResponseBody struct {
 	ID          *int64  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Title       *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	Author      *string `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
@@ -130,6 +120,21 @@ func NewGetBooksBookOK(body []*BookResponse) []*books.Book {
 	return v
 }
 
+// NewGetBooksInternalError builds a books service getBooks endpoint
+// internal_error error.
+func NewGetBooksInternalError(body string) books.InternalError {
+	v := books.InternalError(body)
+
+	return v
+}
+
+// NewGetBooksNotFound builds a books service getBooks endpoint not_found error.
+func NewGetBooksNotFound(body string) books.NotFound {
+	v := books.NotFound(body)
+
+	return v
+}
+
 // NewGetBookBookOK builds a "books" service "getBook" endpoint result from a
 // HTTP "OK" response.
 func NewGetBookBookOK(body *GetBookResponseBody) *books.Book {
@@ -140,6 +145,21 @@ func NewGetBookBookOK(body *GetBookResponseBody) *books.Book {
 		CoverURL:    body.CoverURL,
 		PublishedAt: *body.PublishedAt,
 	}
+
+	return v
+}
+
+// NewGetBookInternalError builds a books service getBook endpoint
+// internal_error error.
+func NewGetBookInternalError(body string) books.InternalError {
+	v := books.InternalError(body)
+
+	return v
+}
+
+// NewGetBookNotFound builds a books service getBook endpoint not_found error.
+func NewGetBookNotFound(body string) books.NotFound {
+	v := books.NotFound(body)
 
 	return v
 }
@@ -158,16 +178,26 @@ func NewCreateBookBookCreated(body *CreateBookResponseBody) *books.Book {
 	return v
 }
 
-// NewCreateBookCoverBookCreated builds a "books" service "createBookCover"
-// endpoint result from a HTTP "Created" response.
-func NewCreateBookCoverBookCreated(body *CreateBookCoverResponseBody) *books.Book {
-	v := &books.Book{
-		ID:          *body.ID,
-		Title:       *body.Title,
-		Author:      *body.Author,
-		CoverURL:    body.CoverURL,
-		PublishedAt: *body.PublishedAt,
-	}
+// NewCreateBookConflict builds a books service createBook endpoint conflict
+// error.
+func NewCreateBookConflict(body string) books.Conflict {
+	v := books.Conflict(body)
+
+	return v
+}
+
+// NewCreateBookInternalError builds a books service createBook endpoint
+// internal_error error.
+func NewCreateBookInternalError(body string) books.InternalError {
+	v := books.InternalError(body)
+
+	return v
+}
+
+// NewCreateBookInvalidInput builds a books service createBook endpoint
+// invalid_input error.
+func NewCreateBookInvalidInput(body string) books.InvalidInput {
+	v := books.InvalidInput(body)
 
 	return v
 }
@@ -186,9 +216,41 @@ func NewUpdateBookBookOK(body *UpdateBookResponseBody) *books.Book {
 	return v
 }
 
-// NewUpdateBookCoverBookOK builds a "books" service "updateBookCover" endpoint
+// NewUpdateBookConflict builds a books service updateBook endpoint conflict
+// error.
+func NewUpdateBookConflict(body string) books.Conflict {
+	v := books.Conflict(body)
+
+	return v
+}
+
+// NewUpdateBookInternalError builds a books service updateBook endpoint
+// internal_error error.
+func NewUpdateBookInternalError(body string) books.InternalError {
+	v := books.InternalError(body)
+
+	return v
+}
+
+// NewUpdateBookInvalidInput builds a books service updateBook endpoint
+// invalid_input error.
+func NewUpdateBookInvalidInput(body string) books.InvalidInput {
+	v := books.InvalidInput(body)
+
+	return v
+}
+
+// NewUpdateBookNotFound builds a books service updateBook endpoint not_found
+// error.
+func NewUpdateBookNotFound(body string) books.NotFound {
+	v := books.NotFound(body)
+
+	return v
+}
+
+// NewSetBookCoverBookOK builds a "books" service "setBookCover" endpoint
 // result from a HTTP "OK" response.
-func NewUpdateBookCoverBookOK(body *UpdateBookCoverResponseBody) *books.Book {
+func NewSetBookCoverBookOK(body *SetBookCoverResponseBody) *books.Book {
 	v := &books.Book{
 		ID:          *body.ID,
 		Title:       *body.Title,
@@ -196,6 +258,54 @@ func NewUpdateBookCoverBookOK(body *UpdateBookCoverResponseBody) *books.Book {
 		CoverURL:    body.CoverURL,
 		PublishedAt: *body.PublishedAt,
 	}
+
+	return v
+}
+
+// NewSetBookCoverInternalError builds a books service setBookCover endpoint
+// internal_error error.
+func NewSetBookCoverInternalError(body string) books.InternalError {
+	v := books.InternalError(body)
+
+	return v
+}
+
+// NewSetBookCoverInvalidImageFormat builds a books service setBookCover
+// endpoint invalid_image_format error.
+func NewSetBookCoverInvalidImageFormat(body string) books.InvalidImageFormat {
+	v := books.InvalidImageFormat(body)
+
+	return v
+}
+
+// NewSetBookCoverNotFound builds a books service setBookCover endpoint
+// not_found error.
+func NewSetBookCoverNotFound(body string) books.NotFound {
+	v := books.NotFound(body)
+
+	return v
+}
+
+// NewSetBookCoverPayloadTooLarge builds a books service setBookCover endpoint
+// payload_too_large error.
+func NewSetBookCoverPayloadTooLarge(body string) books.PayloadTooLarge {
+	v := books.PayloadTooLarge(body)
+
+	return v
+}
+
+// NewDeleteBookInternalError builds a books service deleteBook endpoint
+// internal_error error.
+func NewDeleteBookInternalError(body string) books.InternalError {
+	v := books.InternalError(body)
+
+	return v
+}
+
+// NewDeleteBookNotFound builds a books service deleteBook endpoint not_found
+// error.
+func NewDeleteBookNotFound(body string) books.NotFound {
+	v := books.NotFound(body)
 
 	return v
 }
@@ -242,27 +352,6 @@ func ValidateCreateBookResponseBody(body *CreateBookResponseBody) (err error) {
 	return
 }
 
-// ValidateCreateBookCoverResponseBody runs the validations defined on
-// CreateBookCoverResponseBody
-func ValidateCreateBookCoverResponseBody(body *CreateBookCoverResponseBody) (err error) {
-	if body.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
-	}
-	if body.Title == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("title", "body"))
-	}
-	if body.Author == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("author", "body"))
-	}
-	if body.PublishedAt == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("published_at", "body"))
-	}
-	if body.PublishedAt != nil {
-		err = goa.MergeErrors(err, goa.ValidateFormat("body.published_at", *body.PublishedAt, goa.FormatDate))
-	}
-	return
-}
-
 // ValidateUpdateBookResponseBody runs the validations defined on
 // UpdateBookResponseBody
 func ValidateUpdateBookResponseBody(body *UpdateBookResponseBody) (err error) {
@@ -284,9 +373,9 @@ func ValidateUpdateBookResponseBody(body *UpdateBookResponseBody) (err error) {
 	return
 }
 
-// ValidateUpdateBookCoverResponseBody runs the validations defined on
-// UpdateBookCoverResponseBody
-func ValidateUpdateBookCoverResponseBody(body *UpdateBookCoverResponseBody) (err error) {
+// ValidateSetBookCoverResponseBody runs the validations defined on
+// SetBookCoverResponseBody
+func ValidateSetBookCoverResponseBody(body *SetBookCoverResponseBody) (err error) {
 	if body.ID == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
 	}

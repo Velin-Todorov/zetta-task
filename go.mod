@@ -2,16 +2,19 @@ module github.com/Velin-Todorov/zetta-task
 
 go 1.25.5
 
-require goa.design/goa/v3 v3.25.3
+require (
+	github.com/Masterminds/squirrel v1.5.4
+	goa.design/goa/v3 v3.25.3
+)
 
 require (
-	github.com/Masterminds/squirrel v1.5.4 // indirect
+	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/aws/smithy-go v1.24.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
+	github.com/go-sql-driver/mysql v1.9.3 // indirect
 	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
 	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
-	github.com/sqlc-dev/sqlc v1.30.0 // indirect
 	go.opentelemetry.io/otel v1.40.0 // indirect
 	go.opentelemetry.io/otel/trace v1.40.0 // indirect
 	golang.org/x/term v0.40.0 // indirect

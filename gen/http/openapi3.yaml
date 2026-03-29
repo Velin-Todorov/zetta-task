@@ -19,57 +19,57 @@ paths:
                   allowEmptyValue: true
                   schema:
                     type: string
-                    example: "0"
+                    example: g07
                     minLength: 1
-                  example: o57
+                  example: bs
                 - name: author
                   in: query
                   allowEmptyValue: true
                   schema:
                     type: string
-                    example: 4gj
+                    example: vct
                     minLength: 1
-                  example: orm
+                  example: "68"
                 - name: published_at
                   in: query
                   allowEmptyValue: true
                   schema:
                     type: string
-                    example: "1991-11-24"
+                    example: "2001-02-21"
                     format: date
-                  example: "2002-06-04"
+                  example: "1973-11-17"
                 - name: published_after
                   in: query
                   allowEmptyValue: true
                   schema:
                     type: string
-                    example: "1984-10-22"
+                    example: "2007-08-24"
                     format: date
-                  example: "2006-10-27"
+                  example: "1985-01-20"
                 - name: published_before
                   in: query
                   allowEmptyValue: true
                   schema:
                     type: string
-                    example: "2007-06-12"
+                    example: "1982-03-25"
                     format: date
-                  example: "1975-11-03"
+                  example: "1993-11-20"
                 - name: limit
                   in: query
                   allowEmptyValue: true
                   schema:
                     type: integer
-                    example: 1658808341667584976
+                    example: 6587518560331569569
                     format: int64
-                  example: 7323195020730466378
+                  example: 1774878994672470131
                 - name: offset
                   in: query
                   allowEmptyValue: true
                   schema:
                     type: integer
-                    example: 594581378109610628
+                    example: 4298814998151032143
                     format: int64
-                  example: 8962451874647435356
+                  example: 4960246915237812937
             responses:
                 "200":
                     description: OK response.
@@ -80,37 +80,53 @@ paths:
                                 items:
                                     $ref: '#/components/schemas/Book'
                                 example:
-                                    - author: Veritatis maxime occaecati magni et.
-                                      cover_url: Et sed voluptate nemo voluptates.
-                                      id: 5133803869587210357
-                                      published_at: "1979-10-09"
-                                      title: Nihil accusamus.
-                                    - author: Veritatis maxime occaecati magni et.
-                                      cover_url: Et sed voluptate nemo voluptates.
-                                      id: 5133803869587210357
-                                      published_at: "1979-10-09"
-                                      title: Nihil accusamus.
-                                    - author: Veritatis maxime occaecati magni et.
-                                      cover_url: Et sed voluptate nemo voluptates.
-                                      id: 5133803869587210357
-                                      published_at: "1979-10-09"
-                                      title: Nihil accusamus.
+                                    - author: Et sed voluptate nemo voluptates.
+                                      cover_url: Ut deserunt temporibus at sint optio dolorem.
+                                      id: 2174091076160705473
+                                      published_at: "1994-03-16"
+                                      title: Magni et.
+                                    - author: Et sed voluptate nemo voluptates.
+                                      cover_url: Ut deserunt temporibus at sint optio dolorem.
+                                      id: 2174091076160705473
+                                      published_at: "1994-03-16"
+                                      title: Magni et.
                             example:
-                                - author: Veritatis maxime occaecati magni et.
-                                  cover_url: Et sed voluptate nemo voluptates.
-                                  id: 5133803869587210357
-                                  published_at: "1979-10-09"
-                                  title: Nihil accusamus.
-                                - author: Veritatis maxime occaecati magni et.
-                                  cover_url: Et sed voluptate nemo voluptates.
-                                  id: 5133803869587210357
-                                  published_at: "1979-10-09"
-                                  title: Nihil accusamus.
-                                - author: Veritatis maxime occaecati magni et.
-                                  cover_url: Et sed voluptate nemo voluptates.
-                                  id: 5133803869587210357
-                                  published_at: "1979-10-09"
-                                  title: Nihil accusamus.
+                                - author: Et sed voluptate nemo voluptates.
+                                  cover_url: Ut deserunt temporibus at sint optio dolorem.
+                                  id: 2174091076160705473
+                                  published_at: "1994-03-16"
+                                  title: Magni et.
+                                - author: Et sed voluptate nemo voluptates.
+                                  cover_url: Ut deserunt temporibus at sint optio dolorem.
+                                  id: 2174091076160705473
+                                  published_at: "1994-03-16"
+                                  title: Magni et.
+                                - author: Et sed voluptate nemo voluptates.
+                                  cover_url: Ut deserunt temporibus at sint optio dolorem.
+                                  id: 2174091076160705473
+                                  published_at: "1994-03-16"
+                                  title: Magni et.
+                                - author: Et sed voluptate nemo voluptates.
+                                  cover_url: Ut deserunt temporibus at sint optio dolorem.
+                                  id: 2174091076160705473
+                                  published_at: "1994-03-16"
+                                  title: Magni et.
+                "404":
+                    description: 'not_found: Not Found response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Ad unde eius id.
+                            example: Repudiandae omnis earum.
+                "500":
+                    description: 'internal_error: Internal Server Error response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Dignissimos et ipsam qui aperiam nemo officia.
+                            example: Neque laborum aut eaque.
         post:
             tags:
                 - books
@@ -123,9 +139,9 @@ paths:
                         schema:
                             $ref: '#/components/schemas/CreateBookRequestBody'
                         example:
-                            author: Qui eaque sequi.
-                            published_at: "2009-03-26"
-                            title: Aliquam excepturi velit incidunt iste molestiae.
+                            author: Eum velit quibusdam alias adipisci.
+                            published_at: "2005-07-03"
+                            title: Consequatur ipsum aut corrupti minus.
             responses:
                 "201":
                     description: Created response.
@@ -134,11 +150,35 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Book'
                             example:
-                                author: Qui ea rerum ut soluta.
-                                cover_url: Laboriosam voluptates placeat.
-                                id: 5913967038983033047
-                                published_at: "1998-11-25"
-                                title: Quia amet rerum magni.
+                                author: Beatae ipsum corporis est quis.
+                                cover_url: Animi quia vel ipsam corporis culpa nam.
+                                id: 3957051167527810706
+                                published_at: "1985-06-27"
+                                title: Autem tenetur saepe odit et adipisci.
+                "400":
+                    description: 'invalid_input: Bad Request response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Ipsam autem quisquam adipisci.
+                            example: Sunt quae doloremque omnis ipsam.
+                "409":
+                    description: 'conflict: Conflict response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Quis ad delectus voluptatem.
+                            example: Sit in id tempore voluptas quam impedit.
+                "500":
+                    description: 'internal_error: Internal Server Error response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Aliquid itaque sit provident et sit.
+                            example: Corrupti officiis tenetur quisquam.
     /books/{id}:
         delete:
             tags:
@@ -153,12 +193,28 @@ paths:
                   schema:
                     type: integer
                     description: ID of the book
-                    example: 5886920984786250176
+                    example: 6743272930922536024
                     format: int64
-                  example: 8373621198686456346
+                  example: 4657989844793881989
             responses:
                 "204":
                     description: No Content response.
+                "404":
+                    description: 'not_found: Not Found response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Dolorem delectus.
+                            example: Et ipsum quis odio ab sit.
+                "500":
+                    description: 'internal_error: Internal Server Error response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Veniam quo.
+                            example: Quaerat perspiciatis.
         get:
             tags:
                 - books
@@ -172,9 +228,9 @@ paths:
                   schema:
                     type: integer
                     description: ID of the book
-                    example: 2513408602841306082
+                    example: 5299275243505286735
                     format: int64
-                  example: 3608411315989402758
+                  example: 7495905313052210202
             responses:
                 "200":
                     description: OK response.
@@ -183,11 +239,27 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Book'
                             example:
-                                author: Laudantium architecto esse.
-                                cover_url: Blanditiis provident dolor dolor reiciendis.
-                                id: 6632813022759676477
-                                published_at: "1977-12-15"
-                                title: Et numquam.
+                                author: Aspernatur soluta explicabo voluptatem sed non distinctio.
+                                cover_url: Labore cum libero pariatur et impedit.
+                                id: 5156845107707654653
+                                published_at: "1980-04-27"
+                                title: Et cumque.
+                "404":
+                    description: 'not_found: Not Found response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Quas molestias cupiditate.
+                            example: Necessitatibus minus assumenda est porro quam tempora.
+                "500":
+                    description: 'internal_error: Internal Server Error response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Sit ea.
+                            example: Voluptatem ut labore cumque itaque eveniet dolores.
         patch:
             tags:
                 - books
@@ -201,9 +273,9 @@ paths:
                   schema:
                     type: integer
                     description: ID of the book
-                    example: 618102801709849111
+                    example: 7109588277359205564
                     format: int64
-                  example: 1746000879518224380
+                  example: 9113922304860142974
             requestBody:
                 required: true
                 content:
@@ -211,9 +283,9 @@ paths:
                         schema:
                             $ref: '#/components/schemas/UpdateBookRequestBody'
                         example:
-                            author: Aliquam aperiam.
-                            published_at: "1993-02-06"
-                            title: Ea aut sequi autem.
+                            author: Aspernatur accusamus sint dignissimos quia consequatur ea.
+                            published_at: "2010-04-24"
+                            title: Ducimus doloribus.
             responses:
                 "200":
                     description: OK response.
@@ -222,46 +294,49 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Book'
                             example:
-                                author: Corrupti ad eum rerum non ut.
-                                cover_url: Id non ullam voluptatum.
-                                id: 5718424733436786398
-                                published_at: "2010-11-21"
-                                title: Fugiat perferendis ea qui eum voluptate occaecati.
-    /books/{id}/cover:
-        post:
-            tags:
-                - books
-            summary: createBookCover books
-            operationId: books#createBookCover
-            parameters:
-                - name: id
-                  in: path
-                  description: ID of the book
-                  required: true
-                  schema:
-                    type: integer
-                    description: ID of the book
-                    example: 2503764079057987132
-                    format: int64
-                  example: 4517506437017472857
-            responses:
-                "201":
-                    description: Created response.
+                                author: Enim quo.
+                                cover_url: Porro error ipsam sed.
+                                id: 8473140895541882298
+                                published_at: "1978-03-11"
+                                title: Non ullam voluptatum non distinctio.
+                "400":
+                    description: 'invalid_input: Bad Request response.'
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Book'
-                            example:
-                                author: Voluptatem aut qui iure in.
-                                cover_url: Vitae qui sed vel.
-                                id: 9072270161687811363
-                                published_at: "2012-01-07"
-                                title: Consequatur voluptatem temporibus eum doloremque.
+                                type: string
+                                example: Amet qui quidem non.
+                            example: Facilis deserunt non nostrum fugit.
+                "404":
+                    description: 'not_found: Not Found response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Earum est veritatis sed.
+                            example: Est in hic.
+                "409":
+                    description: 'conflict: Conflict response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Odit magnam accusantium.
+                            example: Reiciendis libero et laborum voluptate corrupti.
+                "500":
+                    description: 'internal_error: Internal Server Error response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Sapiente unde sapiente.
+                            example: Earum nemo id quam ab optio.
+    /books/{id}/cover:
         put:
             tags:
                 - books
-            summary: updateBookCover books
-            operationId: books#updateBookCover
+            summary: setBookCover books
+            operationId: books#setBookCover
             parameters:
                 - name: id
                   in: path
@@ -270,9 +345,9 @@ paths:
                   schema:
                     type: integer
                     description: ID of the book
-                    example: 2842795117314359702
+                    example: 1917429390372628374
                     format: int64
-                  example: 1890328457544575904
+                  example: 7685941032897743638
             responses:
                 "200":
                     description: OK response.
@@ -281,11 +356,43 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Book'
                             example:
-                                author: Eligendi labore sapiente voluptate inventore nisi.
-                                cover_url: Mollitia soluta rem.
-                                id: 922662716789829762
-                                published_at: "1979-01-15"
-                                title: Optio quaerat enim consequatur rem pariatur.
+                                author: Consequatur accusantium laboriosam earum.
+                                cover_url: Alias omnis.
+                                id: 2974244956442087561
+                                published_at: "1975-07-15"
+                                title: Aut sint est in impedit perferendis.
+                "400":
+                    description: 'invalid_image_format: Bad Request response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Porro excepturi sapiente eum.
+                            example: Ut aliquam qui excepturi totam.
+                "404":
+                    description: 'not_found: Not Found response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Dicta eius quidem nihil rem culpa voluptate.
+                            example: Reiciendis veniam expedita.
+                "413":
+                    description: 'payload_too_large: Request Entity Too Large response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Laudantium temporibus quod facere quidem et.
+                            example: Aut sequi facere.
+                "500":
+                    description: 'internal_error: Internal Server Error response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Et maiores minus.
+                            example: Quibusdam alias.
 components:
     schemas:
         Book:
@@ -293,28 +400,28 @@ components:
             properties:
                 author:
                     type: string
-                    example: Debitis blanditiis ab in dolores ipsa vitae.
+                    example: Earum sit voluptates sed alias voluptatum quos.
                 cover_url:
                     type: string
-                    example: Aut ipsam veritatis maxime.
+                    example: Laboriosam eveniet quo dolores rerum.
                 id:
                     type: integer
-                    example: 1815354530930689837
+                    example: 4318571843826868396
                     format: int64
                 published_at:
                     type: string
-                    example: "1997-02-17"
+                    example: "1997-07-25"
                     format: date
                 title:
                     type: string
-                    example: Nihil molestiae tempore voluptas ab.
+                    example: Molestiae qui.
             description: A single book
             example:
-                author: Repellat natus odit possimus fugit rerum.
-                cover_url: Et officiis incidunt.
-                id: 1822507689538841978
-                published_at: "1987-12-02"
-                title: Tempore nihil quisquam voluptatem omnis aliquid.
+                author: Quibusdam nisi non aliquam.
+                cover_url: Et voluptatem non illum quis.
+                id: 218778666934579090
+                published_at: "2002-10-04"
+                title: Cumque laudantium facilis.
             required:
                 - id
                 - title
@@ -326,20 +433,20 @@ components:
                 author:
                     type: string
                     description: Author of the book
-                    example: Ipsam voluptate error nisi cupiditate adipisci ipsum.
+                    example: Voluptatem molestiae repellat numquam consequatur adipisci.
                 published_at:
                     type: string
                     description: Publication time of the book
-                    example: "2009-02-11"
+                    example: "2000-12-08"
                     format: date
                 title:
                     type: string
                     description: Title of the book
-                    example: Repellendus quae ullam iusto est aut.
+                    example: Corrupti enim voluptate consequatur sint voluptatibus consequuntur.
             example:
-                author: Quos repellat.
-                published_at: "1982-02-19"
-                title: Ratione at dolorem minima odit sed.
+                author: Aspernatur at autem qui.
+                published_at: "2006-02-14"
+                title: Blanditiis maiores dolorem laborum facilis in in.
             required:
                 - title
                 - author
@@ -350,20 +457,20 @@ components:
                 author:
                     type: string
                     description: Author of the book
-                    example: Vel voluptatem molestiae.
+                    example: Saepe excepturi sit ipsum et non.
                 published_at:
                     type: string
                     description: Publication time of the book
-                    example: "1978-08-02"
+                    example: "1992-05-25"
                     format: date
                 title:
                     type: string
                     description: Title of the book
-                    example: Voluptate consequatur sint voluptatibus.
+                    example: Est unde ex.
             example:
-                author: Rem aut blanditiis maiores.
-                published_at: "1988-11-26"
-                title: Commodi tenetur dolorem.
+                author: Rerum porro.
+                published_at: "2010-12-20"
+                title: Mollitia magnam laboriosam nihil blanditiis quasi.
 tags:
     - name: books
       description: Service that returns data about books

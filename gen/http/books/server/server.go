@@ -18,14 +18,13 @@ import (
 
 // Server lists the books service endpoint HTTP handlers.
 type Server struct {
-	Mounts          []*MountPoint
-	GetBooks        http.Handler
-	GetBook         http.Handler
-	CreateBook      http.Handler
-	CreateBookCover http.Handler
-	UpdateBook      http.Handler
-	UpdateBookCover http.Handler
-	DeleteBook      http.Handler
+	Mounts       []*MountPoint
+	GetBooks     http.Handler
+	GetBook      http.Handler
+	CreateBook   http.Handler
+	UpdateBook   http.Handler
+	SetBookCover http.Handler
+	DeleteBook   http.Handler
 }
 
 // MountPoint holds information about the mounted endpoints.
@@ -58,18 +57,16 @@ func New(
 			{"GetBooks", "GET", "/books"},
 			{"GetBook", "GET", "/books/{id}"},
 			{"CreateBook", "POST", "/books"},
-			{"CreateBookCover", "POST", "/books/{id}/cover"},
 			{"UpdateBook", "PATCH", "/books/{id}"},
-			{"UpdateBookCover", "PUT", "/books/{id}/cover"},
+			{"SetBookCover", "PUT", "/books/{id}/cover"},
 			{"DeleteBook", "DELETE", "/books/{id}"},
 		},
-		GetBooks:        NewGetBooksHandler(e.GetBooks, mux, decoder, encoder, errhandler, formatter),
-		GetBook:         NewGetBookHandler(e.GetBook, mux, decoder, encoder, errhandler, formatter),
-		CreateBook:      NewCreateBookHandler(e.CreateBook, mux, decoder, encoder, errhandler, formatter),
-		CreateBookCover: NewCreateBookCoverHandler(e.CreateBookCover, mux, decoder, encoder, errhandler, formatter),
-		UpdateBook:      NewUpdateBookHandler(e.UpdateBook, mux, decoder, encoder, errhandler, formatter),
-		UpdateBookCover: NewUpdateBookCoverHandler(e.UpdateBookCover, mux, decoder, encoder, errhandler, formatter),
-		DeleteBook:      NewDeleteBookHandler(e.DeleteBook, mux, decoder, encoder, errhandler, formatter),
+		GetBooks:     NewGetBooksHandler(e.GetBooks, mux, decoder, encoder, errhandler, formatter),
+		GetBook:      NewGetBookHandler(e.GetBook, mux, decoder, encoder, errhandler, formatter),
+		CreateBook:   NewCreateBookHandler(e.CreateBook, mux, decoder, encoder, errhandler, formatter),
+		UpdateBook:   NewUpdateBookHandler(e.UpdateBook, mux, decoder, encoder, errhandler, formatter),
+		SetBookCover: NewSetBookCoverHandler(e.SetBookCover, mux, decoder, encoder, errhandler, formatter),
+		DeleteBook:   NewDeleteBookHandler(e.DeleteBook, mux, decoder, encoder, errhandler, formatter),
 	}
 }
 
@@ -81,9 +78,8 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.GetBooks = m(s.GetBooks)
 	s.GetBook = m(s.GetBook)
 	s.CreateBook = m(s.CreateBook)
-	s.CreateBookCover = m(s.CreateBookCover)
 	s.UpdateBook = m(s.UpdateBook)
-	s.UpdateBookCover = m(s.UpdateBookCover)
+	s.SetBookCover = m(s.SetBookCover)
 	s.DeleteBook = m(s.DeleteBook)
 }
 
@@ -95,9 +91,8 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountGetBooksHandler(mux, h.GetBooks)
 	MountGetBookHandler(mux, h.GetBook)
 	MountCreateBookHandler(mux, h.CreateBook)
-	MountCreateBookCoverHandler(mux, h.CreateBookCover)
 	MountUpdateBookHandler(mux, h.UpdateBook)
-	MountUpdateBookCoverHandler(mux, h.UpdateBookCover)
+	MountSetBookCoverHandler(mux, h.SetBookCover)
 	MountDeleteBookHandler(mux, h.DeleteBook)
 }
 
@@ -131,7 +126,7 @@ func NewGetBooksHandler(
 	var (
 		decodeRequest  = DecodeGetBooksRequest(mux, decoder)
 		encodeResponse = EncodeGetBooksResponse(encoder)
-		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
+		encodeError    = EncodeGetBooksError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
@@ -184,7 +179,7 @@ func NewGetBookHandler(
 	var (
 		decodeRequest  = DecodeGetBookRequest(mux, decoder)
 		encodeResponse = EncodeGetBookResponse(encoder)
-		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
+		encodeError    = EncodeGetBookError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
@@ -237,7 +232,7 @@ func NewCreateBookHandler(
 	var (
 		decodeRequest  = DecodeCreateBookRequest(mux, decoder)
 		encodeResponse = EncodeCreateBookResponse(encoder)
-		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
+		encodeError    = EncodeCreateBookError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
@@ -251,60 +246,6 @@ func NewCreateBookHandler(
 			return
 		}
 		res, err := endpoint(ctx, payload)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil && errhandler != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		if err := encodeResponse(ctx, w, res); err != nil {
-			if errhandler != nil {
-				errhandler(ctx, w, err)
-			}
-		}
-	})
-}
-
-// MountCreateBookCoverHandler configures the mux to serve the "books" service
-// "createBookCover" endpoint.
-func MountCreateBookCoverHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := h.(http.HandlerFunc)
-	if !ok {
-		f = func(w http.ResponseWriter, r *http.Request) {
-			h.ServeHTTP(w, r)
-		}
-	}
-	mux.Handle("POST", "/books/{id}/cover", f)
-}
-
-// NewCreateBookCoverHandler creates a HTTP handler which loads the HTTP
-// request and calls the "books" service "createBookCover" endpoint.
-func NewCreateBookCoverHandler(
-	endpoint goa.Endpoint,
-	mux goahttp.Muxer,
-	decoder func(*http.Request) goahttp.Decoder,
-	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
-	errhandler func(context.Context, http.ResponseWriter, error),
-	formatter func(ctx context.Context, err error) goahttp.Statuser,
-) http.Handler {
-	var (
-		decodeRequest  = DecodeCreateBookCoverRequest(mux, decoder)
-		encodeResponse = EncodeCreateBookCoverResponse(encoder)
-		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
-	)
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "createBookCover")
-		ctx = context.WithValue(ctx, goa.ServiceKey, "books")
-		payload, err := decodeRequest(r)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil && errhandler != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		data := &books.CreateBookCoverRequestData{Payload: payload, Body: r.Body}
-		res, err := endpoint(ctx, data)
 		if err != nil {
 			if err := encodeError(ctx, w, err); err != nil && errhandler != nil {
 				errhandler(ctx, w, err)
@@ -344,7 +285,7 @@ func NewUpdateBookHandler(
 	var (
 		decodeRequest  = DecodeUpdateBookRequest(mux, decoder)
 		encodeResponse = EncodeUpdateBookResponse(encoder)
-		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
+		encodeError    = EncodeUpdateBookError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
@@ -372,9 +313,9 @@ func NewUpdateBookHandler(
 	})
 }
 
-// MountUpdateBookCoverHandler configures the mux to serve the "books" service
-// "updateBookCover" endpoint.
-func MountUpdateBookCoverHandler(mux goahttp.Muxer, h http.Handler) {
+// MountSetBookCoverHandler configures the mux to serve the "books" service
+// "setBookCover" endpoint.
+func MountSetBookCoverHandler(mux goahttp.Muxer, h http.Handler) {
 	f, ok := h.(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
@@ -384,9 +325,9 @@ func MountUpdateBookCoverHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("PUT", "/books/{id}/cover", f)
 }
 
-// NewUpdateBookCoverHandler creates a HTTP handler which loads the HTTP
-// request and calls the "books" service "updateBookCover" endpoint.
-func NewUpdateBookCoverHandler(
+// NewSetBookCoverHandler creates a HTTP handler which loads the HTTP request
+// and calls the "books" service "setBookCover" endpoint.
+func NewSetBookCoverHandler(
 	endpoint goa.Endpoint,
 	mux goahttp.Muxer,
 	decoder func(*http.Request) goahttp.Decoder,
@@ -395,13 +336,13 @@ func NewUpdateBookCoverHandler(
 	formatter func(ctx context.Context, err error) goahttp.Statuser,
 ) http.Handler {
 	var (
-		decodeRequest  = DecodeUpdateBookCoverRequest(mux, decoder)
-		encodeResponse = EncodeUpdateBookCoverResponse(encoder)
-		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
+		decodeRequest  = DecodeSetBookCoverRequest(mux, decoder)
+		encodeResponse = EncodeSetBookCoverResponse(encoder)
+		encodeError    = EncodeSetBookCoverError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "updateBookCover")
+		ctx = context.WithValue(ctx, goa.MethodKey, "setBookCover")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "books")
 		payload, err := decodeRequest(r)
 		if err != nil {
@@ -410,7 +351,7 @@ func NewUpdateBookCoverHandler(
 			}
 			return
 		}
-		data := &books.UpdateBookCoverRequestData{Payload: payload, Body: r.Body}
+		data := &books.SetBookCoverRequestData{Payload: payload, Body: r.Body}
 		res, err := endpoint(ctx, data)
 		if err != nil {
 			if err := encodeError(ctx, w, err); err != nil && errhandler != nil {
@@ -451,7 +392,7 @@ func NewDeleteBookHandler(
 	var (
 		decodeRequest  = DecodeDeleteBookRequest(mux, decoder)
 		encodeResponse = EncodeDeleteBookResponse(encoder)
-		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
+		encodeError    = EncodeDeleteBookError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))

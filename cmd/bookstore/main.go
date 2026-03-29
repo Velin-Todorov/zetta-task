@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"flag"
 	"fmt"
 	"net"
@@ -14,8 +15,11 @@ import (
 	"goa.design/clue/debug"
 	"goa.design/clue/log"
 
-	bookstore "github.com/Velin-Todorov/zetta-task/internal/service"
 	books "github.com/Velin-Todorov/zetta-task/gen/books"
+	"github.com/Velin-Todorov/zetta-task/internal/config"
+	"github.com/Velin-Todorov/zetta-task/internal/repository"
+	bookstore "github.com/Velin-Todorov/zetta-task/internal/service"
+	"github.com/Velin-Todorov/zetta-task/internal/storage"
 )
 
 func main() {
@@ -42,12 +46,26 @@ func main() {
 	}
 	log.Print(ctx, log.KV{K: "http-port", V: *httpPortF})
 
+	cfg, err := config.Load("config.yaml")
+	if err != nil {
+		log.Fatalf(ctx, err, "failed to load config")
+	}
+	
+	database, err := sql.Open("mysql", cfg.Database.DSN())
+	if err != nil {
+		log.Fatalf(ctx, err, "failed to connect to database")
+	}
+	defer database.Close()
+
+	repo := repository.NewMySQLBookRepository(database)
+	store := storage.NewLocalStorage(cfg.Storage.UploadPath)
+	
 	// Initialize the services.
 	var (
 		booksSvc books.Service
 	)
 	{
-		booksSvc = bookstore.NewBooks()
+		booksSvc = bookstore.NewBooks(repo, store)
 	}
 
 	// Wrap the services in endpoints that can be invoked from other services
