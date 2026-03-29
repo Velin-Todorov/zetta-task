@@ -1,0 +1,11 @@
+filename: "{{.InterfaceName}}.go"
+dir: "{{.InterfaceDir}}/mocks"
+structname: "{{.InterfaceName}}"
+pkgname: "mocks"
+packages:
+  github.com/Velin-Todorov/zetta-task/internal/repository:
+    interfaces:
+      BookRepository:
+  github.com/Velin-Todorov/zetta-task/internal/storage:
+    interfaces:
+      ImageStore:
