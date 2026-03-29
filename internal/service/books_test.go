@@ -2,9 +2,11 @@
 package bookstore_test
 
 import (
+	"bytes"
 	"database/sql"
 	"errors"
 	"io"
+	"mime/multipart"
 	"strings"
 	"testing"
 	"time"
@@ -124,7 +126,6 @@ func TestGetBooks_PassesFilters(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-
 func TestGetBook_Success(t *testing.T) {
 	repo := repoMocks.NewBookRepository(t)
 	store := storageMocks.NewImageStore(t)
@@ -237,7 +238,6 @@ func TestCreateBook_InternalError(t *testing.T) {
 	assert.IsType(t, books.InternalError(""), err)
 }
 
-
 func TestUpdateBook_Success(t *testing.T) {
 	repo := repoMocks.NewBookRepository(t)
 	store := storageMocks.NewImageStore(t)
@@ -314,17 +314,31 @@ func TestUpdateBook_Conflict(t *testing.T) {
 	assert.IsType(t, books.Conflict(""), err)
 }
 
+func multipartBody(t *testing.T, fieldName, fileName, content string) (io.ReadCloser, string) {
+	t.Helper()
+	var buf bytes.Buffer
+	writer := multipart.NewWriter(&buf)
+	part, err := writer.CreateFormFile(fieldName, fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, _ = strings.NewReader(content).WriteTo(part)
+	writer.Close()
+	return io.NopCloser(&buf), writer.FormDataContentType()
+}
 
 func TestSetBookCover_Success(t *testing.T) {
 	repo := repoMocks.NewBookRepository(t)
 	store := storageMocks.NewImageStore(t)
 
+	body, contentType := multipartBody(t, "cover", "image.jpg", "fake image data")
+
+	repo.EXPECT().GetBook(mock.Anything, int64(1)).Return(DBMock(), nil)
 	store.EXPECT().Save(mock.Anything, int64(1), mock.Anything).Return("uploads/covers/1.jpg", nil)
 	repo.EXPECT().SetBookCover(mock.Anything, mock.Anything).Return(DBMock(), nil)
 
 	svc := bookstore.NewBooks(repo, store)
-	body := io.NopCloser(strings.NewReader("fake image"))
-	result, err := svc.SetBookCover(t.Context(), &books.SetBookCoverPayload{ID: 1}, body)
+	result, err := svc.SetBookCover(t.Context(), &books.SetBookCoverPayload{ID: 1, ContentType: contentType}, body)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, result.CoverURL)
@@ -335,11 +349,13 @@ func TestSetBookCover_InvalidFormat(t *testing.T) {
 	repo := repoMocks.NewBookRepository(t)
 	store := storageMocks.NewImageStore(t)
 
+	body, contentType := multipartBody(t, "cover", "file.txt", "not an image")
+
+	repo.EXPECT().GetBook(mock.Anything, int64(1)).Return(DBMock(), nil)
 	store.EXPECT().Save(mock.Anything, int64(1), mock.Anything).Return("", storage.ErrInvalidFormat)
 
 	svc := bookstore.NewBooks(repo, store)
-	body := io.NopCloser(strings.NewReader("not an image"))
-	_, err := svc.SetBookCover(t.Context(), &books.SetBookCoverPayload{ID: 1}, body)
+	_, err := svc.SetBookCover(t.Context(), &books.SetBookCoverPayload{ID: 1, ContentType: contentType}, body)
 
 	assert.Error(t, err)
 	assert.IsType(t, books.InvalidImageFormat(""), err)
@@ -349,11 +365,13 @@ func TestSetBookCover_TooLarge(t *testing.T) {
 	repo := repoMocks.NewBookRepository(t)
 	store := storageMocks.NewImageStore(t)
 
+	body, contentType := multipartBody(t, "cover", "huge.jpg", "huge file")
+
+	repo.EXPECT().GetBook(mock.Anything, int64(1)).Return(DBMock(), nil)
 	store.EXPECT().Save(mock.Anything, int64(1), mock.Anything).Return("", storage.ErrTooLarge)
 
 	svc := bookstore.NewBooks(repo, store)
-	body := io.NopCloser(strings.NewReader("huge file"))
-	_, err := svc.SetBookCover(t.Context(), &books.SetBookCoverPayload{ID: 1}, body)
+	_, err := svc.SetBookCover(t.Context(), &books.SetBookCoverPayload{ID: 1, ContentType: contentType}, body)
 
 	assert.Error(t, err)
 	assert.IsType(t, books.PayloadTooLarge(""), err)
@@ -363,12 +381,12 @@ func TestSetBookCover_BookNotFound(t *testing.T) {
 	repo := repoMocks.NewBookRepository(t)
 	store := storageMocks.NewImageStore(t)
 
-	store.EXPECT().Save(mock.Anything, int64(999), mock.Anything).Return("uploads/covers/999.jpg", nil)
-	repo.EXPECT().SetBookCover(mock.Anything, mock.Anything).Return(nil, sql.ErrNoRows)
+	body, contentType := multipartBody(t, "cover", "image.jpg", "fake image")
+
+	repo.EXPECT().GetBook(mock.Anything, int64(999)).Return(nil, sql.ErrNoRows)
 
 	svc := bookstore.NewBooks(repo, store)
-	body := io.NopCloser(strings.NewReader("fake image"))
-	_, err := svc.SetBookCover(t.Context(), &books.SetBookCoverPayload{ID: 999}, body)
+	_, err := svc.SetBookCover(t.Context(), &books.SetBookCoverPayload{ID: 999, ContentType: contentType}, body)
 
 	assert.Error(t, err)
 	assert.IsType(t, books.NotFound(""), err)
