@@ -7,11 +7,12 @@ import (
 	"sync"
 	"time"
 
-	books "github.com/Velin-Todorov/zetta-task/gen/books"
-	bookssvr "github.com/Velin-Todorov/zetta-task/gen/http/books/server"
 	"goa.design/clue/debug"
 	"goa.design/clue/log"
 	goahttp "goa.design/goa/v3/http"
+
+	books "github.com/Velin-Todorov/zetta-task/gen/books"
+	bookssvr "github.com/Velin-Todorov/zetta-task/gen/http/books/server"
 )
 
 // handleHTTPServer starts configures and starts a HTTP server on the given
@@ -47,9 +48,9 @@ func handleHTTPServer(ctx context.Context, u *url.URL, booksEndpoints *books.End
 	var (
 		booksServer *bookssvr.Server
 	)
-	{
+	{	
 		eh := errorHandler(ctx)
-		booksServer = bookssvr.New(booksEndpoints, mux, dec, enc, eh, nil)
+		booksServer = bookssvr.New(booksEndpoints, mux, dec, enc, eh, nil, nil)
 	}
 
 	// Configure the mux.
