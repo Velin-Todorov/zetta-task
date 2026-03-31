@@ -34,6 +34,13 @@ type UpdateBookRequestBody struct {
 	PublishedAt *string `form:"publishedAt,omitempty" json:"publishedAt,omitempty" xml:"publishedAt,omitempty"`
 }
 
+// SetBookCoverRequestBody is the type of the "books" service "setBookCover"
+// endpoint HTTP request body.
+type SetBookCoverRequestBody struct {
+	// Book cover image
+	Cover []byte `form:"cover,omitempty" json:"cover,omitempty" xml:"cover,omitempty"`
+}
+
 // GetBooksResponseBody is the type of the "books" service "getBooks" endpoint
 // HTTP response body.
 type GetBooksResponseBody []*BookResponse
@@ -744,10 +751,11 @@ func NewUpdateBookPayload(body *UpdateBookRequestBody, id int64) *books.UpdateBo
 }
 
 // NewSetBookCoverPayload builds a books service setBookCover endpoint payload.
-func NewSetBookCoverPayload(id int64, contentType string) *books.SetBookCoverPayload {
-	v := &books.SetBookCoverPayload{}
+func NewSetBookCoverPayload(body *SetBookCoverRequestBody, id int64) *books.SetBookCoverPayload {
+	v := &books.SetBookCoverPayload{
+		Cover: body.Cover,
+	}
 	v.ID = id
-	v.ContentType = contentType
 
 	return v
 }
@@ -783,6 +791,15 @@ func ValidateCreateBookRequestBody(body *CreateBookRequestBody) (err error) {
 func ValidateUpdateBookRequestBody(body *UpdateBookRequestBody) (err error) {
 	if body.PublishedAt != nil {
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.publishedAt", *body.PublishedAt, goa.FormatDate))
+	}
+	return
+}
+
+// ValidateSetBookCoverRequestBody runs the validations defined on
+// SetBookCoverRequestBody
+func ValidateSetBookCoverRequestBody(body *SetBookCoverRequestBody) (err error) {
+	if body.Cover == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("cover", "body"))
 	}
 	return
 }

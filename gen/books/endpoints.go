@@ -9,7 +9,6 @@ package books
 
 import (
 	"context"
-	"io"
 
 	goa "goa.design/goa/v3/pkg"
 )
@@ -22,15 +21,6 @@ type Endpoints struct {
 	UpdateBook   goa.Endpoint
 	SetBookCover goa.Endpoint
 	DeleteBook   goa.Endpoint
-}
-
-// SetBookCoverRequestData holds both the payload and the HTTP request body
-// reader of the "setBookCover" method.
-type SetBookCoverRequestData struct {
-	// Payload is the method payload.
-	Payload *SetBookCoverPayload
-	// Body streams the HTTP request body.
-	Body io.ReadCloser
 }
 
 // NewEndpoints wraps the methods of the "books" service with endpoints.
@@ -95,8 +85,8 @@ func NewUpdateBookEndpoint(s Service) goa.Endpoint {
 // "setBookCover" of service "books".
 func NewSetBookCoverEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
-		ep := req.(*SetBookCoverRequestData)
-		return s.SetBookCover(ctx, ep.Payload, ep.Body)
+		p := req.(*SetBookCoverPayload)
+		return s.SetBookCover(ctx, p)
 	}
 }
 

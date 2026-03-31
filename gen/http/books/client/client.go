@@ -9,8 +9,10 @@ package client
 
 import (
 	"context"
+	"mime/multipart"
 	"net/http"
 
+	books "github.com/Velin-Todorov/zetta-task/gen/books"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -53,6 +55,10 @@ type Client struct {
 	encoder func(*http.Request) goahttp.Encoder
 	decoder func(*http.Response) goahttp.Decoder
 }
+
+// BooksSetBookCoverEncoderFunc is the type to encode multipart request for the
+// "books" service "setBookCover" endpoint.
+type BooksSetBookCoverEncoderFunc func(*multipart.Writer, *books.SetBookCoverPayload) error
 
 // NewClient instantiates HTTP clients for all the books service servers.
 func NewClient(
@@ -172,9 +178,9 @@ func (c *Client) UpdateBook() goa.Endpoint {
 
 // SetBookCover returns an endpoint that makes HTTP requests to the books
 // service setBookCover server.
-func (c *Client) SetBookCover() goa.Endpoint {
+func (c *Client) SetBookCover(booksSetBookCoverEncoderFn BooksSetBookCoverEncoderFunc) goa.Endpoint {
 	var (
-		encodeRequest  = EncodeSetBookCoverRequest(c.encoder)
+		encodeRequest  = EncodeSetBookCoverRequest(NewBooksSetBookCoverEncoder(booksSetBookCoverEncoderFn))
 		decodeResponse = DecodeSetBookCoverResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v any) (any, error) {

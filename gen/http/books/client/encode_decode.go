@@ -12,9 +12,9 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/url"
-	"os"
 
 	books "github.com/Velin-Todorov/zetta-task/gen/books"
 	goahttp "goa.design/goa/v3/http"
@@ -511,20 +511,17 @@ func DecodeUpdateBookResponse(decoder func(*http.Response) goahttp.Decoder, rest
 // path set to call the "books" service "setBookCover" endpoint
 func (c *Client) BuildSetBookCoverRequest(ctx context.Context, v any) (*http.Request, error) {
 	var (
-		id   int64
-		body io.Reader
+		id int64
 	)
 	{
-		rd, ok := v.(*books.SetBookCoverRequestData)
+		p, ok := v.(*books.SetBookCoverPayload)
 		if !ok {
-			return nil, goahttp.ErrInvalidType("books", "setBookCover", "books.SetBookCoverRequestData", v)
+			return nil, goahttp.ErrInvalidType("books", "setBookCover", "*books.SetBookCoverPayload", v)
 		}
-		p := rd.Payload
-		body = rd.Body
 		id = p.ID
 	}
 	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: SetBookCoverBooksPath(id)}
-	req, err := http.NewRequest("PUT", u.String(), body)
+	req, err := http.NewRequest("PUT", u.String(), nil)
 	if err != nil {
 		return nil, goahttp.ErrInvalidURL("books", "setBookCover", u.String(), err)
 	}
@@ -539,16 +536,32 @@ func (c *Client) BuildSetBookCoverRequest(ctx context.Context, v any) (*http.Req
 // setBookCover server.
 func EncodeSetBookCoverRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
 	return func(req *http.Request, v any) error {
-		data, ok := v.(*books.SetBookCoverRequestData)
+		p, ok := v.(*books.SetBookCoverPayload)
 		if !ok {
-			return goahttp.ErrInvalidType("books", "setBookCover", "*books.SetBookCoverRequestData", v)
+			return goahttp.ErrInvalidType("books", "setBookCover", "*books.SetBookCoverPayload", v)
 		}
-		p := data.Payload
-		{
-			head := p.ContentType
-			req.Header.Set("Content-Type", head)
+		if err := encoder(req).Encode(p); err != nil {
+			return goahttp.ErrEncodingError("books", "setBookCover", err)
 		}
 		return nil
+	}
+}
+
+// NewBooksSetBookCoverEncoder returns an encoder to encode the multipart
+// request for the "books" service "setBookCover" endpoint.
+func NewBooksSetBookCoverEncoder(encoderFn BooksSetBookCoverEncoderFunc) func(r *http.Request) goahttp.Encoder {
+	return func(r *http.Request) goahttp.Encoder {
+		body := &bytes.Buffer{}
+		mw := multipart.NewWriter(body)
+		return goahttp.EncodingFunc(func(v any) error {
+			p := v.(*books.SetBookCoverPayload)
+			if err := encoderFn(mw, p); err != nil {
+				return err
+			}
+			r.Body = io.NopCloser(body)
+			r.Header.Set("Content-Type", mw.FormDataContentType())
+			return mw.Close()
+		})
 	}
 }
 
@@ -652,19 +665,6 @@ func DecodeSetBookCoverResponse(decoder func(*http.Response) goahttp.Decoder, re
 			return nil, goahttp.ErrInvalidResponse("books", "setBookCover", resp.StatusCode, string(body))
 		}
 	}
-}
-
-// // BuildSetBookCoverStreamPayload creates a streaming endpoint request payload
-// from the method payload and the path to the file to be streamed
-func BuildSetBookCoverStreamPayload(payload any, fpath string) (*books.SetBookCoverRequestData, error) {
-	f, err := os.Open(fpath)
-	if err != nil {
-		return nil, err
-	}
-	return &books.SetBookCoverRequestData{
-		Payload: payload.(*books.SetBookCoverPayload),
-		Body:    f,
-	}, nil
 }
 
 // BuildDeleteBookRequest instantiates a HTTP request object with method and

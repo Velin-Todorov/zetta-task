@@ -9,19 +9,22 @@ A RESTful API for managing books, built with Go using the Goa framework. Support
 
 ## Setup & Run
 
-1. Start the MySQL database:
+1. Start everything with Docker Compose:
 
 ```bash
-docker compose up -d
+docker compose up --build
 ```
 
-2. Run the application:
+This starts both the MySQL database and the application. Database migrations run automatically on startup.
+
+The server starts on `http://localhost:8080`.
+
+2. Alternatively, run locally (requires a running MySQL instance):
 
 ```bash
+docker compose up mysql -d
 go run ./cmd/bookstore --http-port 8080
 ```
-
-The server starts on `http://localhost:8080`. Database migrations run automatically on startup.
 
 ## Configuration
 
@@ -40,6 +43,22 @@ server:
 
 storage:
   upload_path: uploads/covers
+```
+
+The `DB_HOST` environment variable overrides the database host, which is used by Docker Compose to connect to the MySQL container.
+
+## API Documentation (Swagger)
+
+Interactive Swagger UI is available at:
+
+```
+http://localhost:8080/swagger
+```
+
+The raw OpenAPI 3.0 spec is available at:
+
+```
+http://localhost:8080/openapi.json
 ```
 
 ## API Endpoints
@@ -128,6 +147,13 @@ Content-Type: multipart/form-data
 
 Supported formats: JPEG, PNG, WebP. Max size: 5MB.
 
+Book covers are stored on the local filesystem under `uploads/covers/`. The file is validated by reading the file header (`http.DetectContentType`), not by trusting the file extension. Uploading a new cover replaces any existing one for that book.
+
+The cover URL is returned in the book response as `cover_url` and can be accessed at:
+```
+GET /uploads/covers/{filename}
+```
+
 Example:
 ```bash
 curl -X PUT http://localhost:8080/books/1/cover \
@@ -158,7 +184,9 @@ curl -X DELETE http://localhost:8080/books/1
 | 413  | Payload Too Large (image exceeds 5MB) |
 | 500  | Internal Server Error |
 
-## Project Structure
+## Architecture
+
+### Project Structure
 
 ```
 cmd/bookstore/       - Application entry point and HTTP server
@@ -171,11 +199,37 @@ internal/
   service/           - Business logic (implements Goa service interface)
   storage/           - File storage for book covers
 sql/
-  schema/            - Database migrations
+  schema/            - Database migrations (golang-migrate)
   queries/           - sqlc query definitions
+public/              - Static files (Swagger UI)
 ```
 
+### Repository Pattern
+
+The data access layer uses the repository pattern. `BookRepository` is an interface defined in `internal/repository/book.go`, with the MySQL implementation in `internal/repository/mysql.go`. This provides:
+
+- **Testability** - the service layer depends on an interface, not a concrete implementation. Tests inject a mock repository without needing a database.
+- **Separation of concerns** - SQL and database-specific logic stays in the repository. The service layer only knows about the interface.
+- **Swappability** - the MySQL implementation can be replaced (e.g. PostgreSQL) without touching the service layer.
+
+### Database
+
+- **sqlc** generates type-safe Go code from SQL queries for static operations (get, create, update, delete).
+- **squirrel** is used for the dynamic `GetBooks` query where filters are optional and built at runtime.
+- **golang-migrate** runs schema migrations automatically on application startup.
+
 ## Running Tests
+
+The project includes three types of tests:
+
+### Whitebox Tests
+Tests in the same package (`package bookstore`) that verify internal/unexported functions like `toBook` mapping logic.
+
+### Blackbox Tests
+Tests in an external package (`package bookstore_test`) that verify the public service API. Dependencies (repository, storage) are mocked using [mockery](https://github.com/vektra/mockery)-generated mocks.
+
+### Integration Tests (Testcontainers)
+Repository tests use [testcontainers-go](https://github.com/testcontainers/testcontainers-go) to spin up a real MySQL container for each test run. This ensures the SQL queries, migrations, and constraint handling (e.g. unique index conflicts) are tested against an actual database, not mocks. The container is created and destroyed automatically - no manual setup required, just Docker running.
 
 ```bash
 # All tests
@@ -188,9 +242,11 @@ go test ./internal/service/ -v
 go test ./internal/storage/ -v
 
 # Repository integration tests (requires Docker)
-go test ./internal/repository/ -v -timeout 120s # You need the timeout to give enough for the testcontainer to start
+go test ./internal/repository/ -v -timeout 120s
 ```
+
+The timeout flag for repository tests is needed to allow time for the MySQL container to start.
 
 ## API Specification
 
-The full OpenAPI 3.0 specification is available at `gen/http/openapi3.yaml`.
+The full OpenAPI 3.0 specification is available at `gen/http/openapi3.yaml` or served at `/openapi.json` when the application is running.

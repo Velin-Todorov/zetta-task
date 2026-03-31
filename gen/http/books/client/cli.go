@@ -184,8 +184,21 @@ func BuildUpdateBookPayload(booksUpdateBookBody string, booksUpdateBookID string
 
 // BuildSetBookCoverPayload builds the payload for the books setBookCover
 // endpoint from CLI flags.
-func BuildSetBookCoverPayload(booksSetBookCoverID string, booksSetBookCoverContentType string) (*books.SetBookCoverPayload, error) {
+func BuildSetBookCoverPayload(booksSetBookCoverBody string, booksSetBookCoverID string) (*books.SetBookCoverPayload, error) {
 	var err error
+	var body SetBookCoverRequestBody
+	{
+		err = json.Unmarshal([]byte(booksSetBookCoverBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"cover\": \"RXN0IHNpbWlsaXF1ZSBhdXQgYXV0Lg==\"\n   }'")
+		}
+		if body.Cover == nil {
+			err = goa.MergeErrors(err, goa.MissingFieldError("cover", "body"))
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
 	var id int64
 	{
 		id, err = strconv.ParseInt(booksSetBookCoverID, 10, 64)
@@ -193,13 +206,10 @@ func BuildSetBookCoverPayload(booksSetBookCoverID string, booksSetBookCoverConte
 			return nil, fmt.Errorf("invalid value for id, must be INT64")
 		}
 	}
-	var contentType string
-	{
-		contentType = booksSetBookCoverContentType
+	v := &books.SetBookCoverPayload{
+		Cover: body.Cover,
 	}
-	v := &books.SetBookCoverPayload{}
 	v.ID = id
-	v.ContentType = contentType
 
 	return v, nil
 }

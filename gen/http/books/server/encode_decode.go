@@ -485,31 +485,52 @@ func EncodeSetBookCoverResponse(encoder func(context.Context, http.ResponseWrite
 func DecodeSetBookCoverRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (*books.SetBookCoverPayload, error) {
 	return func(r *http.Request) (*books.SetBookCoverPayload, error) {
 		var payload *books.SetBookCoverPayload
-		var (
-			id          int64
-			contentType string
-			err         error
-
-			params = mux.Vars(r)
-		)
-		{
-			idRaw := params["id"]
-			v, err2 := strconv.ParseInt(idRaw, 10, 64)
-			if err2 != nil {
-				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("id", idRaw, "integer"))
+		if err := decoder(r).Decode(&payload); err != nil {
+			var gerr *goa.ServiceError
+			if errors.As(err, &gerr) {
+				return payload, gerr
 			}
-			id = v
+			return payload, goa.DecodePayloadError(err.Error())
 		}
-		contentType = r.Header.Get("Content-Type")
-		if contentType == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("contentType", "header"))
-		}
-		if err != nil {
-			return payload, err
-		}
-		payload = NewSetBookCoverPayload(id, contentType)
 
 		return payload, nil
+	}
+}
+
+// NewBooksSetBookCoverDecoder returns a decoder to decode the multipart
+// request for the "books" service "setBookCover" endpoint.
+func NewBooksSetBookCoverDecoder(mux goahttp.Muxer, booksSetBookCoverDecoderFn BooksSetBookCoverDecoderFunc) func(r *http.Request) goahttp.Decoder {
+	return func(r *http.Request) goahttp.Decoder {
+		return goahttp.EncodingFunc(func(v any) error {
+			mr, merr := r.MultipartReader()
+			if merr != nil {
+				return merr
+			}
+			p := v.(**books.SetBookCoverPayload)
+			if err := booksSetBookCoverDecoderFn(mr, p); err != nil {
+				return err
+			}
+
+			var (
+				id  int64
+				err error
+
+				params = mux.Vars(r)
+			)
+			{
+				idRaw := params["id"]
+				v, err2 := strconv.ParseInt(idRaw, 10, 64)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("id", idRaw, "integer"))
+				}
+				id = v
+			}
+			if err != nil {
+				return err
+			}
+			(*p).ID = id
+			return nil
+		})
 	}
 }
 

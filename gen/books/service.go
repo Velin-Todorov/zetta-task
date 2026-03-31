@@ -9,7 +9,6 @@ package books
 
 import (
 	"context"
-	"io"
 
 	goa "goa.design/goa/v3/pkg"
 )
@@ -25,7 +24,7 @@ type Service interface {
 	// UpdateBook implements updateBook.
 	UpdateBook(context.Context, *UpdateBookPayload) (res *Book, err error)
 	// SetBookCover implements setBookCover.
-	SetBookCover(context.Context, *SetBookCoverPayload, io.ReadCloser) (res *Book, err error)
+	SetBookCover(context.Context, *SetBookCoverPayload) (res *Book, err error)
 	// DeleteBook implements deleteBook.
 	DeleteBook(context.Context, *DeleteBookPayload) (err error)
 }
@@ -93,8 +92,8 @@ type GetBooksPayload struct {
 type SetBookCoverPayload struct {
 	// ID of the book
 	ID int64
-	// Content-Type header
-	ContentType string
+	// Book cover image
+	Cover []byte
 }
 
 // UpdateBookPayload is the payload type of the books service updateBook method.

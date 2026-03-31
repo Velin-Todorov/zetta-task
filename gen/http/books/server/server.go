@@ -9,6 +9,7 @@ package server
 
 import (
 	"context"
+	"mime/multipart"
 	"net/http"
 	"path"
 
@@ -44,6 +45,10 @@ type MountPoint struct {
 	Pattern string
 }
 
+// BooksSetBookCoverDecoderFunc is the type to decode multipart request for the
+// "books" service "setBookCover" endpoint.
+type BooksSetBookCoverDecoderFunc func(*multipart.Reader, **books.SetBookCoverPayload) error
+
 // New instantiates HTTP handlers for all the books service endpoints using the
 // provided encoder and decoder. The handlers are mounted on the given mux
 // using the HTTP verb and path defined in the design. errhandler is called
@@ -57,6 +62,7 @@ func New(
 	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
 	errhandler func(context.Context, http.ResponseWriter, error),
 	formatter func(ctx context.Context, err error) goahttp.Statuser,
+	booksSetBookCoverDecoderFn BooksSetBookCoverDecoderFunc,
 	fileSystemUploadsCovers http.FileSystem,
 	fileSystemGenHTTPOpenapi3JSON http.FileSystem,
 	fileSystemPublicSwaggerHTML http.FileSystem,
@@ -95,7 +101,7 @@ func New(
 		GetBook:             NewGetBookHandler(e.GetBook, mux, decoder, encoder, errhandler, formatter),
 		CreateBook:          NewCreateBookHandler(e.CreateBook, mux, decoder, encoder, errhandler, formatter),
 		UpdateBook:          NewUpdateBookHandler(e.UpdateBook, mux, decoder, encoder, errhandler, formatter),
-		SetBookCover:        NewSetBookCoverHandler(e.SetBookCover, mux, decoder, encoder, errhandler, formatter),
+		SetBookCover:        NewSetBookCoverHandler(e.SetBookCover, mux, NewBooksSetBookCoverDecoder(mux, booksSetBookCoverDecoderFn), encoder, errhandler, formatter),
 		DeleteBook:          NewDeleteBookHandler(e.DeleteBook, mux, decoder, encoder, errhandler, formatter),
 		CORS:                NewCORSHandler(),
 		UploadsCovers:       http.FileServer(fileSystemUploadsCovers),
@@ -390,8 +396,7 @@ func NewSetBookCoverHandler(
 			}
 			return
 		}
-		data := &books.SetBookCoverRequestData{Payload: payload, Body: r.Body}
-		res, err := endpoint(ctx, data)
+		res, err := endpoint(ctx, payload)
 		if err != nil {
 			if err := encodeError(ctx, w, err); err != nil && errhandler != nil {
 				errhandler(ctx, w, err)
@@ -537,6 +542,8 @@ func HandleBooksOrigin(h http.Handler) http.Handler {
 			w.Header().Set("Vary", "Origin")
 			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
+				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
+				w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 				w.WriteHeader(204)
 				return
 			}

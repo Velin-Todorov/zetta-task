@@ -41,6 +41,7 @@ func ParseEndpoint(
 	enc func(*http.Request) goahttp.Encoder,
 	dec func(*http.Response) goahttp.Decoder,
 	restore bool,
+	booksSetBookCoverEncoderFn booksc.BooksSetBookCoverEncoderFunc,
 ) (goa.Endpoint, any, error) {
 	var (
 		booksFlags = flag.NewFlagSet("books", flag.ContinueOnError)
@@ -64,10 +65,9 @@ func ParseEndpoint(
 		booksUpdateBookBodyFlag = booksUpdateBookFlags.String("body", "REQUIRED", "")
 		booksUpdateBookIDFlag   = booksUpdateBookFlags.String("id", "REQUIRED", "ID of the book")
 
-		booksSetBookCoverFlags           = flag.NewFlagSet("set-book-cover", flag.ExitOnError)
-		booksSetBookCoverIDFlag          = booksSetBookCoverFlags.String("id", "REQUIRED", "ID of the book")
-		booksSetBookCoverContentTypeFlag = booksSetBookCoverFlags.String("content-type", "REQUIRED", "")
-		booksSetBookCoverStreamFlag      = booksSetBookCoverFlags.String("stream", "REQUIRED", "path to file containing the streamed request body")
+		booksSetBookCoverFlags    = flag.NewFlagSet("set-book-cover", flag.ExitOnError)
+		booksSetBookCoverBodyFlag = booksSetBookCoverFlags.String("body", "REQUIRED", "")
+		booksSetBookCoverIDFlag   = booksSetBookCoverFlags.String("id", "REQUIRED", "ID of the book")
 
 		booksDeleteBookFlags  = flag.NewFlagSet("delete-book", flag.ExitOnError)
 		booksDeleteBookIDFlag = booksDeleteBookFlags.String("id", "REQUIRED", "ID of the book")
@@ -170,11 +170,8 @@ func ParseEndpoint(
 				endpoint = c.UpdateBook()
 				data, err = booksc.BuildUpdateBookPayload(*booksUpdateBookBodyFlag, *booksUpdateBookIDFlag)
 			case "set-book-cover":
-				endpoint = c.SetBookCover()
-				data, err = booksc.BuildSetBookCoverPayload(*booksSetBookCoverIDFlag, *booksSetBookCoverContentTypeFlag)
-				if err == nil {
-					data, err = booksc.BuildSetBookCoverStreamPayload(data, *booksSetBookCoverStreamFlag)
-				}
+				endpoint = c.SetBookCover(booksSetBookCoverEncoderFn)
+				data, err = booksc.BuildSetBookCoverPayload(*booksSetBookCoverBodyFlag, *booksSetBookCoverIDFlag)
 			case "delete-book":
 				endpoint = c.DeleteBook()
 				data, err = booksc.BuildDeleteBookPayload(*booksDeleteBookIDFlag)
@@ -292,9 +289,8 @@ func booksUpdateBookUsage() {
 func booksSetBookCoverUsage() {
 	// Header with flags
 	fmt.Fprintf(os.Stderr, "%s [flags] books set-book-cover", os.Args[0])
+	fmt.Fprint(os.Stderr, " -body JSON")
 	fmt.Fprint(os.Stderr, " -id INT64")
-	fmt.Fprint(os.Stderr, " -content-type STRING")
-	fmt.Fprint(os.Stderr, " -stream STRING")
 	fmt.Fprintln(os.Stderr)
 
 	// Description
@@ -302,13 +298,12 @@ func booksSetBookCoverUsage() {
 	fmt.Fprintln(os.Stderr, `SetBookCover implements setBookCover.`)
 
 	// Flags list
+	fmt.Fprintln(os.Stderr, `    -body JSON: `)
 	fmt.Fprintln(os.Stderr, `    -id INT64: ID of the book`)
-	fmt.Fprintln(os.Stderr, `    -content-type STRING: `)
-	fmt.Fprintln(os.Stderr, `    -stream STRING: path to file containing the streamed request body`)
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books set-book-cover --id 1232998587138181062 --content-type \"Similique aut aut molestiae quo.\" --stream \"goa.png\"")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books set-book-cover --body '{\n      \"cover\": \"RXN0IHNpbWlsaXF1ZSBhdXQgYXV0Lg==\"\n   }' --id 2535831667953208005")
 }
 
 func booksDeleteBookUsage() {
@@ -326,5 +321,5 @@ func booksDeleteBookUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books delete-book --id 2267516450293920262")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books delete-book --id 1287784084538983663")
 }

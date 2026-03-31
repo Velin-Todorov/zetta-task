@@ -34,6 +34,13 @@ type UpdateBookRequestBody struct {
 	PublishedAt *string `form:"publishedAt,omitempty" json:"publishedAt,omitempty" xml:"publishedAt,omitempty"`
 }
 
+// SetBookCoverRequestBody is the type of the "books" service "setBookCover"
+// endpoint HTTP request body.
+type SetBookCoverRequestBody struct {
+	// Book cover image
+	Cover []byte `form:"cover" json:"cover" xml:"cover"`
+}
+
 // GetBookResponseBody is the type of the "books" service "getBook" endpoint
 // HTTP response body.
 type GetBookResponseBody struct {
@@ -408,6 +415,15 @@ func NewUpdateBookRequestBody(p *books.UpdateBookPayload) *UpdateBookRequestBody
 		Title:       p.Title,
 		Author:      p.Author,
 		PublishedAt: p.PublishedAt,
+	}
+	return body
+}
+
+// NewSetBookCoverRequestBody builds the HTTP request body from the payload of
+// the "setBookCover" endpoint of the "books" service.
+func NewSetBookCoverRequestBody(p *books.SetBookCoverPayload) *SetBookCoverRequestBody {
+	body := &SetBookCoverRequestBody{
+		Cover: p.Cover,
 	}
 	return body
 }

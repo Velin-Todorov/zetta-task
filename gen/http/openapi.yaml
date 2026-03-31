@@ -3,7 +3,7 @@ info:
     title: Bookstore API
     description: An api that returns data about books in a bookstore
     version: 1.0.0
-host: 0.0.0.0:8080
+host: localhost:8080
 consumes:
     - application/json
     - application/xml
@@ -226,6 +226,8 @@ paths:
                 - books
             summary: setBookCover books
             operationId: books#setBookCover
+            consumes:
+                - multipart/form-data
             parameters:
                 - name: id
                   in: path
@@ -233,11 +235,13 @@ paths:
                   required: true
                   type: integer
                   format: int64
-                - name: Content-Type
-                  in: header
-                  description: Content-Type header
+                - name: SetBookCoverRequestBody
+                  in: formData
                   required: true
-                  type: string
+                  schema:
+                    $ref: '#/definitions/BooksSetBookCoverRequestBody'
+                    required:
+                        - cover
             responses:
                 "200":
                     description: OK response.
@@ -322,13 +326,13 @@ definitions:
         properties:
             author:
                 type: string
-                example: Molestiae non sequi et ducimus.
+                example: Et ducimus consectetur et voluptatem autem vel.
             cover_url:
                 type: string
-                example: Et voluptatem autem vel ut recusandae dolores.
+                example: Recusandae dolores.
             id:
                 type: integer
-                example: 5664987013752852662
+                example: 7063541483181457008
                 format: int64
             publishedAt:
                 type: string
@@ -336,7 +340,7 @@ definitions:
                 format: date
             title:
                 type: string
-                example: Eos et.
+                example: Non eos et earum molestiae non.
         description: A single book
         example:
             author: Voluptate vel ut omnis facere molestiae esse.
@@ -510,7 +514,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: true
+                example: false
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -526,18 +530,18 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: true
+                example: false
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: false
+                example: true
         description: deleteBook_internal_error_response_body result type (default view)
         example:
             fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: false
+            temporary: true
             timeout: true
         required:
             - name
@@ -569,7 +573,7 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: true
+                example: false
             timeout:
                 type: boolean
                 description: Is the error a timeout?
@@ -933,6 +937,56 @@ definitions:
             - temporary
             - timeout
             - fault
+    BooksSetBookCoverRequestBody:
+        title: BooksSetBookCoverRequestBody
+        type: object
+        properties:
+            cover:
+                type: string
+                description: Book cover image
+                example:
+                    - 73
+                    - 110
+                    - 99
+                    - 105
+                    - 100
+                    - 117
+                    - 110
+                    - 116
+                    - 32
+                    - 109
+                    - 105
+                    - 110
+                    - 105
+                    - 109
+                    - 97
+                    - 32
+                    - 115
+                    - 105
+                    - 110
+                    - 116
+                    - 46
+                format: byte
+        example:
+            cover:
+                - 67
+                - 111
+                - 110
+                - 115
+                - 101
+                - 113
+                - 117
+                - 97
+                - 116
+                - 117
+                - 114
+                - 32
+                - 97
+                - 117
+                - 116
+                - 46
+        required:
+            - cover
     BooksUpdateBookConflictResponseBody:
         title: 'Mediatype identifier: application/vnd.goa.error; view=default'
         type: object
@@ -1149,18 +1203,18 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: false
+                example: true
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: true
+                example: false
         description: Error response result type (default view)
         example:
-            fault: true
+            fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: false
+            temporary: true
             timeout: false
         required:
             - name

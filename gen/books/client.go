@@ -9,7 +9,6 @@ package books
 
 import (
 	"context"
-	"io"
 
 	goa "goa.design/goa/v3/pkg"
 )
@@ -117,9 +116,9 @@ func (c *Client) UpdateBook(ctx context.Context, p *UpdateBookPayload) (res *Boo
 //   - "conflict" (type *goa.ServiceError)
 //   - "internal_error" (type *goa.ServiceError)
 //   - error: internal error
-func (c *Client) SetBookCover(ctx context.Context, p *SetBookCoverPayload, req io.ReadCloser) (res *Book, err error) {
+func (c *Client) SetBookCover(ctx context.Context, p *SetBookCoverPayload) (res *Book, err error) {
 	var ires any
-	ires, err = c.SetBookCoverEndpoint(ctx, &SetBookCoverRequestData{Payload: p, Body: req})
+	ires, err = c.SetBookCoverEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
