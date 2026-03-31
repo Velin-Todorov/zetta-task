@@ -1,2 +1,1 @@
 DROP TABLE IF EXISTS `books`;
-DROP INDEX IF EXISTS 'title_author'

@@ -29,7 +29,7 @@ func UsageCommands() []string {
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + " " + "books get-books --title \"gh\" --author \"tnv\" --published-at \"1988-10-06\" --published-after \"1995-02-16\" --published-before \"2004-06-03\" --limit 6325897615762823788 --offset 3500938087851868914" + "\n" +
+	return os.Args[0] + " " + "books get-books --title \"p\" --author \"2\" --published-at \"2000-04-01\" --published-after \"1990-02-08\" --published-before \"2014-07-04\" --limit 5971686587402052785 --offset 5897553918948982507" + "\n" +
 		""
 }
 
@@ -64,9 +64,10 @@ func ParseEndpoint(
 		booksUpdateBookBodyFlag = booksUpdateBookFlags.String("body", "REQUIRED", "")
 		booksUpdateBookIDFlag   = booksUpdateBookFlags.String("id", "REQUIRED", "ID of the book")
 
-		booksSetBookCoverFlags      = flag.NewFlagSet("set-book-cover", flag.ExitOnError)
-		booksSetBookCoverIDFlag     = booksSetBookCoverFlags.String("id", "REQUIRED", "ID of the book")
-		booksSetBookCoverStreamFlag = booksSetBookCoverFlags.String("stream", "REQUIRED", "path to file containing the streamed request body")
+		booksSetBookCoverFlags           = flag.NewFlagSet("set-book-cover", flag.ExitOnError)
+		booksSetBookCoverIDFlag          = booksSetBookCoverFlags.String("id", "REQUIRED", "ID of the book")
+		booksSetBookCoverContentTypeFlag = booksSetBookCoverFlags.String("content-type", "REQUIRED", "")
+		booksSetBookCoverStreamFlag      = booksSetBookCoverFlags.String("stream", "REQUIRED", "path to file containing the streamed request body")
 
 		booksDeleteBookFlags  = flag.NewFlagSet("delete-book", flag.ExitOnError)
 		booksDeleteBookIDFlag = booksDeleteBookFlags.String("id", "REQUIRED", "ID of the book")
@@ -170,7 +171,7 @@ func ParseEndpoint(
 				data, err = booksc.BuildUpdateBookPayload(*booksUpdateBookBodyFlag, *booksUpdateBookIDFlag)
 			case "set-book-cover":
 				endpoint = c.SetBookCover()
-				data, err = booksc.BuildSetBookCoverPayload(*booksSetBookCoverIDFlag)
+				data, err = booksc.BuildSetBookCoverPayload(*booksSetBookCoverIDFlag, *booksSetBookCoverContentTypeFlag)
 				if err == nil {
 					data, err = booksc.BuildSetBookCoverStreamPayload(data, *booksSetBookCoverStreamFlag)
 				}
@@ -229,7 +230,7 @@ func booksGetBooksUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books get-books --title \"gh\" --author \"tnv\" --published-at \"1988-10-06\" --published-after \"1995-02-16\" --published-before \"2004-06-03\" --limit 6325897615762823788 --offset 3500938087851868914")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books get-books --title \"p\" --author \"2\" --published-at \"2000-04-01\" --published-after \"1990-02-08\" --published-before \"2014-07-04\" --limit 5971686587402052785 --offset 5897553918948982507")
 }
 
 func booksGetBookUsage() {
@@ -247,7 +248,7 @@ func booksGetBookUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books get-book --id 2926505384489231124")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books get-book --id 5909787674201432190")
 }
 
 func booksCreateBookUsage() {
@@ -265,7 +266,7 @@ func booksCreateBookUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books create-book --body '{\n      \"author\": \"Eum velit quibusdam alias adipisci.\",\n      \"published_at\": \"2005-07-03\",\n      \"title\": \"Consequatur ipsum aut corrupti minus.\"\n   }'")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books create-book --body '{\n      \"author\": \"Eum esse.\",\n      \"publishedAt\": \"2011-11-11\",\n      \"title\": \"Quia rerum odit amet.\"\n   }'")
 }
 
 func booksUpdateBookUsage() {
@@ -285,13 +286,14 @@ func booksUpdateBookUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books update-book --body '{\n      \"author\": \"Aspernatur accusamus sint dignissimos quia consequatur ea.\",\n      \"published_at\": \"2010-04-24\",\n      \"title\": \"Ducimus doloribus.\"\n   }' --id 5270956565065754013")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books update-book --body '{\n      \"author\": \"Eaque beatae natus amet dolor a et.\",\n      \"publishedAt\": \"1998-09-28\",\n      \"title\": \"Ut non ab repellat sed architecto laborum.\"\n   }' --id 8509440648643756047")
 }
 
 func booksSetBookCoverUsage() {
 	// Header with flags
 	fmt.Fprintf(os.Stderr, "%s [flags] books set-book-cover", os.Args[0])
 	fmt.Fprint(os.Stderr, " -id INT64")
+	fmt.Fprint(os.Stderr, " -content-type STRING")
 	fmt.Fprint(os.Stderr, " -stream STRING")
 	fmt.Fprintln(os.Stderr)
 
@@ -301,11 +303,12 @@ func booksSetBookCoverUsage() {
 
 	// Flags list
 	fmt.Fprintln(os.Stderr, `    -id INT64: ID of the book`)
+	fmt.Fprintln(os.Stderr, `    -content-type STRING: `)
 	fmt.Fprintln(os.Stderr, `    -stream STRING: path to file containing the streamed request body`)
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books set-book-cover --id 1977736719779695197 --stream \"goa.png\"")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books set-book-cover --id 1232998587138181062 --content-type \"Similique aut aut molestiae quo.\" --stream \"goa.png\"")
 }
 
 func booksDeleteBookUsage() {
@@ -323,5 +326,5 @@ func booksDeleteBookUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books delete-book --id 7025038568542974860")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books delete-book --id 2267516450293920262")
 }

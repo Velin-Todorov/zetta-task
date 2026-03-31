@@ -12,6 +12,9 @@ import (
 	"sync"
 	"syscall"
 
+	"github.com/golang-migrate/migrate/v4"
+	mmysql "github.com/golang-migrate/migrate/v4/database/mysql"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"goa.design/clue/debug"
 	"goa.design/clue/log"
 
@@ -53,9 +56,26 @@ func main() {
 	
 	database, err := sql.Open("mysql", cfg.Database.DSN())
 	if err != nil {
-		log.Fatalf(ctx, err, "failed to connect to database")
+		log.Fatalf(ctx, err, "failed to open database")
 	}
 	defer database.Close()
+
+	if err := database.PingContext(ctx); err != nil {
+		log.Fatalf(ctx, err, "failed to connect to database")
+	}
+
+	// Run migrations
+	driver, err := mmysql.WithInstance(database, &mmysql.Config{})
+	if err != nil {
+		log.Fatalf(ctx, err, "failed to create migration driver")
+	}
+	m, err := migrate.NewWithDatabaseInstance("file://sql/schema", cfg.Database.Name, driver)
+	if err != nil {
+		log.Fatalf(ctx, err, "failed to create migration instance")
+	}
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		log.Fatalf(ctx, err, "failed to run migrations")
+	}
 
 	repo := repository.NewMySQLBookRepository(database)
 	store := storage.NewLocalStorage(cfg.Storage.UploadPath)
@@ -98,7 +118,7 @@ func main() {
 	switch *hostF {
 	case "localhost":
 		{
-			addr := "http://localhost:80"
+			addr := "http://0.0.0.0:80"
 			u, err := url.Parse(addr)
 			if err != nil {
 				log.Fatalf(ctx, err, "invalid URL %#v\n", addr)

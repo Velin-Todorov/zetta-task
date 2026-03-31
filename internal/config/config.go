@@ -42,6 +42,11 @@ func Load(path string) (*Config, error) {
         return nil, fmt.Errorf("parsing config: %w", err)
     }
 
+    // Allow env var overrides for Docker
+    if host := os.Getenv("DB_HOST"); host != "" {
+        cfg.Database.Host = host
+    }
+
     return &cfg, nil
 }
 

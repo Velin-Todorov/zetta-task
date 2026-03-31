@@ -14,7 +14,7 @@ type localStorage struct {
 }
 
 func (s *localStorage) Save(ctx context.Context, id int64, r io.Reader) (string, error) {
-	lr := io.LimitReader(r, maxFileSize+1)
+	lr := io.LimitReader(r, maxFileSize+1) // what is this?
 
 	buf, err := io.ReadAll(lr)
 	if err != nil {
@@ -26,13 +26,19 @@ func (s *localStorage) Save(ctx context.Context, id int64, r io.Reader) (string,
 	}
 
 	contentType := http.DetectContentType(buf)
-	ext, ok := allowedTypes[contentType]; 
+	ext, ok := allowedTypes[contentType]
 	if !ok {
 		return "", ErrInvalidFormat
 	}
 
 	if err := os.MkdirAll(s.basePath, 0755); err != nil {
 		return "", err
+	}
+
+	// Remove existing covers for this ID
+	matches, _ := filepath.Glob(filepath.Join(s.basePath, fmt.Sprintf("%d.*", id)))
+	for _, m := range matches {
+		os.Remove(m)
 	}
 
 	filename := fmt.Sprintf("%d%s", id, ext)

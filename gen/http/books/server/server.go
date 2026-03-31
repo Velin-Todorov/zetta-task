@@ -10,21 +10,27 @@ package server
 import (
 	"context"
 	"net/http"
+	"path"
 
 	books "github.com/Velin-Todorov/zetta-task/gen/books"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
+	"goa.design/plugins/v3/cors"
 )
 
 // Server lists the books service endpoint HTTP handlers.
 type Server struct {
-	Mounts       []*MountPoint
-	GetBooks     http.Handler
-	GetBook      http.Handler
-	CreateBook   http.Handler
-	UpdateBook   http.Handler
-	SetBookCover http.Handler
-	DeleteBook   http.Handler
+	Mounts              []*MountPoint
+	GetBooks            http.Handler
+	GetBook             http.Handler
+	CreateBook          http.Handler
+	UpdateBook          http.Handler
+	SetBookCover        http.Handler
+	DeleteBook          http.Handler
+	CORS                http.Handler
+	UploadsCovers       http.Handler
+	GenHTTPOpenapi3JSON http.Handler
+	PublicSwaggerHTML   http.Handler
 }
 
 // MountPoint holds information about the mounted endpoints.
@@ -51,7 +57,22 @@ func New(
 	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
 	errhandler func(context.Context, http.ResponseWriter, error),
 	formatter func(ctx context.Context, err error) goahttp.Statuser,
+	fileSystemUploadsCovers http.FileSystem,
+	fileSystemGenHTTPOpenapi3JSON http.FileSystem,
+	fileSystemPublicSwaggerHTML http.FileSystem,
 ) *Server {
+	if fileSystemUploadsCovers == nil {
+		fileSystemUploadsCovers = http.Dir(".")
+	}
+	fileSystemUploadsCovers = appendPrefix(fileSystemUploadsCovers, "/./uploads/covers")
+	if fileSystemGenHTTPOpenapi3JSON == nil {
+		fileSystemGenHTTPOpenapi3JSON = http.Dir(".")
+	}
+	fileSystemGenHTTPOpenapi3JSON = appendPrefix(fileSystemGenHTTPOpenapi3JSON, "/gen/http")
+	if fileSystemPublicSwaggerHTML == nil {
+		fileSystemPublicSwaggerHTML = http.Dir(".")
+	}
+	fileSystemPublicSwaggerHTML = appendPrefix(fileSystemPublicSwaggerHTML, "/public")
 	return &Server{
 		Mounts: []*MountPoint{
 			{"GetBooks", "GET", "/books"},
@@ -60,13 +81,26 @@ func New(
 			{"UpdateBook", "PATCH", "/books/{id}"},
 			{"SetBookCover", "PUT", "/books/{id}/cover"},
 			{"DeleteBook", "DELETE", "/books/{id}"},
+			{"CORS", "OPTIONS", "/books"},
+			{"CORS", "OPTIONS", "/books/{id}"},
+			{"CORS", "OPTIONS", "/books/{id}/cover"},
+			{"CORS", "OPTIONS", "/uploads/covers/{*path}"},
+			{"CORS", "OPTIONS", "/openapi.json"},
+			{"CORS", "OPTIONS", "/swagger"},
+			{"Serve ./uploads/covers", "GET", "/uploads/covers"},
+			{"Serve ./gen/http/openapi3.json", "GET", "/openapi.json"},
+			{"Serve ./public/swagger.html", "GET", "/swagger"},
 		},
-		GetBooks:     NewGetBooksHandler(e.GetBooks, mux, decoder, encoder, errhandler, formatter),
-		GetBook:      NewGetBookHandler(e.GetBook, mux, decoder, encoder, errhandler, formatter),
-		CreateBook:   NewCreateBookHandler(e.CreateBook, mux, decoder, encoder, errhandler, formatter),
-		UpdateBook:   NewUpdateBookHandler(e.UpdateBook, mux, decoder, encoder, errhandler, formatter),
-		SetBookCover: NewSetBookCoverHandler(e.SetBookCover, mux, decoder, encoder, errhandler, formatter),
-		DeleteBook:   NewDeleteBookHandler(e.DeleteBook, mux, decoder, encoder, errhandler, formatter),
+		GetBooks:            NewGetBooksHandler(e.GetBooks, mux, decoder, encoder, errhandler, formatter),
+		GetBook:             NewGetBookHandler(e.GetBook, mux, decoder, encoder, errhandler, formatter),
+		CreateBook:          NewCreateBookHandler(e.CreateBook, mux, decoder, encoder, errhandler, formatter),
+		UpdateBook:          NewUpdateBookHandler(e.UpdateBook, mux, decoder, encoder, errhandler, formatter),
+		SetBookCover:        NewSetBookCoverHandler(e.SetBookCover, mux, decoder, encoder, errhandler, formatter),
+		DeleteBook:          NewDeleteBookHandler(e.DeleteBook, mux, decoder, encoder, errhandler, formatter),
+		CORS:                NewCORSHandler(),
+		UploadsCovers:       http.FileServer(fileSystemUploadsCovers),
+		GenHTTPOpenapi3JSON: http.FileServer(fileSystemGenHTTPOpenapi3JSON),
+		PublicSwaggerHTML:   http.FileServer(fileSystemPublicSwaggerHTML),
 	}
 }
 
@@ -81,6 +115,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.UpdateBook = m(s.UpdateBook)
 	s.SetBookCover = m(s.SetBookCover)
 	s.DeleteBook = m(s.DeleteBook)
+	s.CORS = m(s.CORS)
 }
 
 // MethodNames returns the methods served.
@@ -94,6 +129,10 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountUpdateBookHandler(mux, h.UpdateBook)
 	MountSetBookCoverHandler(mux, h.SetBookCover)
 	MountDeleteBookHandler(mux, h.DeleteBook)
+	MountCORSHandler(mux, h.CORS)
+	MountUploadsCovers(mux, http.StripPrefix("/uploads/covers", h.UploadsCovers))
+	MountGenHTTPOpenapi3JSON(mux, h.GenHTTPOpenapi3JSON)
+	MountPublicSwaggerHTML(mux, h.PublicSwaggerHTML)
 }
 
 // Mount configures the mux to serve the books endpoints.
@@ -104,7 +143,7 @@ func (s *Server) Mount(mux goahttp.Muxer) {
 // MountGetBooksHandler configures the mux to serve the "books" service
 // "getBooks" endpoint.
 func MountGetBooksHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := h.(http.HandlerFunc)
+	f, ok := HandleBooksOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
 			h.ServeHTTP(w, r)
@@ -157,7 +196,7 @@ func NewGetBooksHandler(
 // MountGetBookHandler configures the mux to serve the "books" service
 // "getBook" endpoint.
 func MountGetBookHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := h.(http.HandlerFunc)
+	f, ok := HandleBooksOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
 			h.ServeHTTP(w, r)
@@ -210,7 +249,7 @@ func NewGetBookHandler(
 // MountCreateBookHandler configures the mux to serve the "books" service
 // "createBook" endpoint.
 func MountCreateBookHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := h.(http.HandlerFunc)
+	f, ok := HandleBooksOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
 			h.ServeHTTP(w, r)
@@ -263,7 +302,7 @@ func NewCreateBookHandler(
 // MountUpdateBookHandler configures the mux to serve the "books" service
 // "updateBook" endpoint.
 func MountUpdateBookHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := h.(http.HandlerFunc)
+	f, ok := HandleBooksOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
 			h.ServeHTTP(w, r)
@@ -316,7 +355,7 @@ func NewUpdateBookHandler(
 // MountSetBookCoverHandler configures the mux to serve the "books" service
 // "setBookCover" endpoint.
 func MountSetBookCoverHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := h.(http.HandlerFunc)
+	f, ok := HandleBooksOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
 			h.ServeHTTP(w, r)
@@ -370,7 +409,7 @@ func NewSetBookCoverHandler(
 // MountDeleteBookHandler configures the mux to serve the "books" service
 // "deleteBook" endpoint.
 func MountDeleteBookHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := h.(http.HandlerFunc)
+	f, ok := HandleBooksOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
 			h.ServeHTTP(w, r)
@@ -417,5 +456,94 @@ func NewDeleteBookHandler(
 				errhandler(ctx, w, err)
 			}
 		}
+	})
+}
+
+// appendFS is a custom implementation of fs.FS that appends a specified prefix
+// to the file paths before delegating the Open call to the underlying fs.FS.
+type appendFS struct {
+	prefix string
+	fs     http.FileSystem
+}
+
+// Open opens the named file, appending the prefix to the file path before
+// passing it to the underlying fs.FS.
+func (s appendFS) Open(name string) (http.File, error) {
+	switch name {
+	case "/openapi.json":
+		name = "/openapi3.json"
+	case "/swagger":
+		name = "/swagger.html"
+	}
+	return s.fs.Open(path.Join(s.prefix, name))
+}
+
+// appendPrefix returns a new fs.FS that appends the specified prefix to file paths
+// before delegating to the provided embed.FS.
+func appendPrefix(fsys http.FileSystem, prefix string) http.FileSystem {
+	return appendFS{prefix: prefix, fs: fsys}
+}
+
+// MountUploadsCovers configures the mux to serve GET request made to
+// "/uploads/covers".
+func MountUploadsCovers(mux goahttp.Muxer, h http.Handler) {
+	mux.Handle("GET", "/uploads/covers/", HandleBooksOrigin(h).ServeHTTP)
+	mux.Handle("GET", "/uploads/covers/{*path}", HandleBooksOrigin(h).ServeHTTP)
+}
+
+// MountGenHTTPOpenapi3JSON configures the mux to serve GET request made to
+// "/openapi.json".
+func MountGenHTTPOpenapi3JSON(mux goahttp.Muxer, h http.Handler) {
+	mux.Handle("GET", "/openapi.json", HandleBooksOrigin(h).ServeHTTP)
+}
+
+// MountPublicSwaggerHTML configures the mux to serve GET request made to
+// "/swagger".
+func MountPublicSwaggerHTML(mux goahttp.Muxer, h http.Handler) {
+	mux.Handle("GET", "/swagger", HandleBooksOrigin(h).ServeHTTP)
+}
+
+// MountCORSHandler configures the mux to serve the CORS endpoints for the
+// service books.
+func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
+	h = HandleBooksOrigin(h)
+	mux.Handle("OPTIONS", "/books", h.ServeHTTP)
+	mux.Handle("OPTIONS", "/books/{id}", h.ServeHTTP)
+	mux.Handle("OPTIONS", "/books/{id}/cover", h.ServeHTTP)
+	mux.Handle("OPTIONS", "/uploads/covers/{*path}", h.ServeHTTP)
+	mux.Handle("OPTIONS", "/openapi.json", h.ServeHTTP)
+	mux.Handle("OPTIONS", "/swagger", h.ServeHTTP)
+}
+
+// NewCORSHandler creates a HTTP handler which returns a simple 204 response.
+func NewCORSHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(204)
+	})
+}
+
+// HandleBooksOrigin applies the CORS response headers corresponding to the
+// origin for the service books.
+func HandleBooksOrigin(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		origin := r.Header.Get("Origin")
+		if origin == "" {
+			// Not a CORS request
+			h.ServeHTTP(w, r)
+			return
+		}
+		if cors.MatchOrigin(origin, "*") {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Vary", "Origin")
+			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				w.WriteHeader(204)
+				return
+			}
+			h.ServeHTTP(w, r)
+			return
+		}
+		h.ServeHTTP(w, r)
+		return
 	})
 }

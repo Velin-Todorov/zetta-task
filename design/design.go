@@ -2,22 +2,30 @@ package design
 
 import (
 	. "goa.design/goa/v3/dsl"
+	cors "goa.design/plugins/v3/cors/dsl"
 )
 
 var _ = API("bookstore", func() {
 	Title("Bookstore API")
 	Description("An api that returns data about books in a bookstore")
 	Version("1.0.0")
+	Server("bookstore", func() {
+		Host("localhost", func() {
+			URI("http://0.0.0.0:8080")
+		})
+	})
 })
 
 var _ = Service("books", func() {
 	Description("Service that returns data about books")
-	Error("not_found", String, "Book not found")
-	Error("invalid_input", String, "Invalid input")
-	Error("invalid_image_format", String, "Unsupported image format")
-	Error("payload_too_large", String, "File size exceeds limit")
-	Error("conflict", String, "Book already exists")
-	Error("internal_error", String, "Internal server error")
+	Error("not_found")
+	Error("invalid_input")
+	Error("invalid_image_format")
+	Error("payload_too_large")
+	Error("conflict")
+	Error("internal_error")
+
+	cors.Origin("*")
 
 	Method("getBooks", func() {
 		Result(ArrayOf(Book))
@@ -28,7 +36,7 @@ var _ = Service("books", func() {
 			Attribute("author", String, func() {
 				MinLength(1)
 			})
-			Attribute("published_at", String, func() {
+			Attribute("publishedAt", String, func() {
 				Format(FormatDate)
 			})
 			Attribute("published_after", String, func() {
@@ -45,7 +53,7 @@ var _ = Service("books", func() {
 			GET("/books")
 			Param("title")
 			Param("author")
-			Param("published_at")
+			Param("publishedAt")
 			Param("published_after")
 			Param("published_before")
 			Param("limit")
@@ -78,11 +86,11 @@ var _ = Service("books", func() {
 		Payload(func() {
 			Attribute("title", String, "Title of the book")
 			Attribute("author", String, "Author of the book")
-			Attribute("published_at", String, func() {
+			Attribute("publishedAt", String, func() {
 				Format(FormatDate)
 				Description("Publication time of the book")
 			})
-			Required("title", "author", "published_at")
+			Required("title", "author", "publishedAt")
 		})
 		Result(Book)
 		HTTP(func() {
@@ -101,7 +109,7 @@ var _ = Service("books", func() {
 			Attribute("id", Int64, "ID of the book")
 			Attribute("title", String, "Title of the book")
 			Attribute("author", String, "Author of the book")
-			Attribute("published_at", String, func() {
+			Attribute("publishedAt", String, func() {
 				Format(FormatDate)
 				Description("Publication time of the book")
 			})
@@ -123,11 +131,13 @@ var _ = Service("books", func() {
 	Method("setBookCover", func() {
 		Payload(func() {
 			Attribute("id", Int64, "ID of the book")
-			Required("id")
+			Attribute("contentType", String, "Content-Type header")
+			Required("id", "contentType")
 		})
 		Result(Book)
 		HTTP(func() {
 			PUT("/books/{id}/cover")
+			Header("contentType:Content-Type")
 			SkipRequestBodyEncodeDecode()
 			Response(StatusOK)
 			Response("not_found", StatusNotFound)
@@ -150,4 +160,7 @@ var _ = Service("books", func() {
 		})
 	})
 
+	Files("/uploads/covers/{*path}", "./uploads/covers")
+	Files("/openapi.json", "./gen/http/openapi3.json")
+	Files("/swagger", "./public/swagger.html")
 })

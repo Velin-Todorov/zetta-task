@@ -3,7 +3,10 @@ package bookstore
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"io"
+	"mime"
+	"mime/multipart"
 	"time"
 
 	books "github.com/Velin-Todorov/zetta-task/gen/books"
@@ -49,7 +52,7 @@ func (s *bookssrvc) GetBooks(ctx context.Context, p *books.GetBooksPayload) ([]*
 
 	res, err := s.repo.GetBooks(ctx, filter)
 	if err != nil {
-		return nil, books.InternalError(err.Error())
+		return nil, books.MakeInternalError(err)
 	}
 
 	for _, r := range res {
@@ -63,10 +66,10 @@ func (s *bookssrvc) GetBooks(ctx context.Context, p *books.GetBooksPayload) ([]*
 func (s *bookssrvc) GetBook(ctx context.Context, p *books.GetBookPayload) (*books.Book, error) {
 	dbBook, err := s.repo.GetBook(ctx, p.ID)
 	if err == sql.ErrNoRows {
-		return nil, books.NotFound("book not found")
+		return nil, books.MakeNotFound(err)
 	}
 	if err != nil {
-		return nil, books.InternalError(err.Error())
+		return nil, books.MakeInternalError(err)
 	}
 
 	return toBook(dbBook), nil
@@ -76,7 +79,7 @@ func (s *bookssrvc) GetBook(ctx context.Context, p *books.GetBookPayload) (*book
 func (s *bookssrvc) CreateBook(ctx context.Context, p *books.CreateBookPayload) (*books.Book, error) {
 	publishedAt, err := time.Parse(time.DateOnly, p.PublishedAt)
 	if err != nil {
-		return nil, books.InvalidInput("invalid date format")
+		return nil, books.MakeInvalidInput(err)
 	}
 
 	book, err := s.repo.CreateBook(ctx, db.CreateBookParams{
@@ -86,9 +89,9 @@ func (s *bookssrvc) CreateBook(ctx context.Context, p *books.CreateBookPayload) 
 	})
 	if err != nil {
 		if repository.IsConflict(err) {
-			return nil, books.Conflict("book with this title and author already exists")
+			return nil, books.MakeConflict(err)
 		}
-		return nil, books.InternalError(err.Error())
+		return nil, books.MakeInternalError(err)
 	}
 
 	return toBook(book), nil
@@ -98,15 +101,29 @@ func (s *bookssrvc) CreateBook(ctx context.Context, p *books.CreateBookPayload) 
 func (s *bookssrvc) SetBookCover(ctx context.Context, p *books.SetBookCoverPayload, req io.ReadCloser) (*books.Book, error) {
 	defer req.Close()
 
-	path, err := s.storage.Save(ctx, p.ID, req)
+	_, err := s.repo.GetBook(ctx, p.ID)
+	if err == sql.ErrNoRows {
+		return nil, books.MakeNotFound(err)
+	}
+	if err != nil {
+		return nil, books.MakeInternalError(err)
+	}
+
+	file, err := extractFile(req, p.ContentType)
+	if err != nil {
+		return nil, books.MakeInvalidInput(err)
+	}
+	defer file.Close()
+
+	path, err := s.storage.Save(ctx, p.ID, file)
 	if err != nil {
 		if storage.IsInvalidFormat(err) {
-			return nil, books.InvalidImageFormat(err.Error())
+			return nil, books.MakeInvalidImageFormat(err)
 		}
 		if storage.IsTooLarge(err) {
-			return nil, books.PayloadTooLarge(err.Error())
+			return nil, books.MakePayloadTooLarge(err)
 		}
-		return nil, books.InternalError(err.Error())
+		return nil, books.MakeInternalError(err)
 	}
 
 	book, err := s.repo.SetBookCover(ctx, db.UpdateBookCoverParams{
@@ -114,10 +131,10 @@ func (s *bookssrvc) SetBookCover(ctx context.Context, p *books.SetBookCoverPaylo
 		CoverPath: sql.NullString{String: path, Valid: true},
 	})
 	if err == sql.ErrNoRows {
-		return nil, books.NotFound("book not found")
+		return nil, books.MakeNotFound(err)
 	}
 	if err != nil {
-		return nil, books.InternalError(err.Error())
+		return nil, books.MakeInternalError(err)
 	}
 
 	return toBook(book), nil
@@ -127,10 +144,10 @@ func (s *bookssrvc) SetBookCover(ctx context.Context, p *books.SetBookCoverPaylo
 func (s *bookssrvc) UpdateBook(ctx context.Context, p *books.UpdateBookPayload) (*books.Book, error) {
 	existing, err := s.repo.GetBook(ctx, p.ID)
 	if err == sql.ErrNoRows {
-		return nil, books.NotFound("book not found")
+		return nil, books.MakeNotFound(err)
 	}
 	if err != nil {
-		return nil, books.InternalError(err.Error())
+		return nil, books.MakeInternalError(err)
 	}
 
 	params := db.UpdateBookParams{
@@ -149,15 +166,15 @@ func (s *bookssrvc) UpdateBook(ctx context.Context, p *books.UpdateBookPayload) 
 	if p.PublishedAt != nil {
 		params.PublishedAt, err = time.Parse(time.DateOnly, *p.PublishedAt)
 		if err != nil {
-			return nil, books.InvalidInput("invalid date format")
+			return nil, books.MakeInvalidInput(err)
 		}
 	}
 	book, err := s.repo.UpdateBook(ctx, params)
 	if err != nil {
 		if repository.IsConflict(err) {
-			return nil, books.Conflict("book with this title and author already exists")
+			return nil, books.MakeConflict(err)
 		}
-		return nil, books.InternalError(err.Error())
+		return nil, books.MakeInternalError(err)
 	}
 
 	return toBook(book), nil
@@ -167,16 +184,33 @@ func (s *bookssrvc) UpdateBook(ctx context.Context, p *books.UpdateBookPayload) 
 func (s *bookssrvc) DeleteBook(ctx context.Context, p *books.DeleteBookPayload) error {
 	_, err := s.repo.GetBook(ctx, p.ID)
 	if err == sql.ErrNoRows {
-		return books.NotFound("book not found")
+		return books.MakeNotFound(err)
 	}
 	if err != nil {
-		return books.InternalError(err.Error())
+		return books.MakeInternalError(err)
 	}
 
 	if err := s.repo.DeleteBook(ctx, p.ID); err != nil {
-		return books.InternalError(err.Error())
+		return books.MakeInternalError(err)
 	}
 	return nil
+}
+
+func extractFile(body io.Reader, contentType string) (io.ReadCloser, error) {
+	_, params, err := mime.ParseMediaType(contentType)
+	if err != nil {
+		return nil, err
+	}
+	boundary, ok := params["boundary"]
+	if !ok {
+		return nil, fmt.Errorf("no boundary in content type")
+	}
+	reader := multipart.NewReader(body, boundary)
+	part, err := reader.NextPart()
+	if err != nil {
+		return nil, err
+	}
+	return part, nil
 }
 
 func toBook(dbBook *db.Book) *books.Book {

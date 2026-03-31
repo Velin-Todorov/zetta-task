@@ -67,12 +67,12 @@ func DecodeGetBooksRequest(mux goahttp.Muxer, decoder func(*http.Request) goahtt
 				err = goa.MergeErrors(err, goa.InvalidLengthError("author", *author, utf8.RuneCountInString(*author), 1, true))
 			}
 		}
-		publishedAtRaw := qp.Get("published_at")
+		publishedAtRaw := qp.Get("publishedAt")
 		if publishedAtRaw != "" {
 			publishedAt = &publishedAtRaw
 		}
 		if publishedAt != nil {
-			err = goa.MergeErrors(err, goa.ValidateFormat("published_at", *publishedAt, goa.FormatDate))
+			err = goa.MergeErrors(err, goa.ValidateFormat("publishedAt", *publishedAt, goa.FormatDate))
 		}
 		publishedAfterRaw := qp.Get("published_after")
 		if publishedAfterRaw != "" {
@@ -127,21 +127,31 @@ func EncodeGetBooksError(encoder func(context.Context, http.ResponseWriter) goah
 			return encodeError(ctx, w, v)
 		}
 		switch en.GoaErrorName() {
-		case "internal_error":
-			var res books.InternalError
-			errors.As(v, &res)
-			enc := encoder(ctx, w)
-			body := res
-			w.Header().Set("goa-error", res.GoaErrorName())
-			w.WriteHeader(http.StatusInternalServerError)
-			return enc.Encode(body)
 		case "not_found":
-			var res books.NotFound
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewGetBooksNotFoundResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "internal_error":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewGetBooksInternalErrorResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)
@@ -200,21 +210,31 @@ func EncodeGetBookError(encoder func(context.Context, http.ResponseWriter) goaht
 			return encodeError(ctx, w, v)
 		}
 		switch en.GoaErrorName() {
-		case "internal_error":
-			var res books.InternalError
-			errors.As(v, &res)
-			enc := encoder(ctx, w)
-			body := res
-			w.Header().Set("goa-error", res.GoaErrorName())
-			w.WriteHeader(http.StatusInternalServerError)
-			return enc.Encode(body)
 		case "not_found":
-			var res books.NotFound
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewGetBookNotFoundResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "internal_error":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewGetBookInternalErrorResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)
@@ -276,28 +296,43 @@ func EncodeCreateBookError(encoder func(context.Context, http.ResponseWriter) go
 		}
 		switch en.GoaErrorName() {
 		case "conflict":
-			var res books.Conflict
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewCreateBookConflictResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusConflict)
 			return enc.Encode(body)
-		case "internal_error":
-			var res books.InternalError
-			errors.As(v, &res)
-			enc := encoder(ctx, w)
-			body := res
-			w.Header().Set("goa-error", res.GoaErrorName())
-			w.WriteHeader(http.StatusInternalServerError)
-			return enc.Encode(body)
 		case "invalid_input":
-			var res books.InvalidInput
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewCreateBookInvalidInputResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "internal_error":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewCreateBookInternalErrorResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)
@@ -375,37 +410,57 @@ func EncodeUpdateBookError(encoder func(context.Context, http.ResponseWriter) go
 			return encodeError(ctx, w, v)
 		}
 		switch en.GoaErrorName() {
-		case "conflict":
-			var res books.Conflict
+		case "not_found":
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewUpdateBookNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "conflict":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewUpdateBookConflictResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusConflict)
 			return enc.Encode(body)
-		case "internal_error":
-			var res books.InternalError
-			errors.As(v, &res)
-			enc := encoder(ctx, w)
-			body := res
-			w.Header().Set("goa-error", res.GoaErrorName())
-			w.WriteHeader(http.StatusInternalServerError)
-			return enc.Encode(body)
 		case "invalid_input":
-			var res books.InvalidInput
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewUpdateBookInvalidInputResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
-		case "not_found":
-			var res books.NotFound
+		case "internal_error":
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewUpdateBookInternalErrorResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
-			w.WriteHeader(http.StatusNotFound)
+			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)
@@ -431,8 +486,9 @@ func DecodeSetBookCoverRequest(mux goahttp.Muxer, decoder func(*http.Request) go
 	return func(r *http.Request) (*books.SetBookCoverPayload, error) {
 		var payload *books.SetBookCoverPayload
 		var (
-			id  int64
-			err error
+			id          int64
+			contentType string
+			err         error
 
 			params = mux.Vars(r)
 		)
@@ -444,10 +500,14 @@ func DecodeSetBookCoverRequest(mux goahttp.Muxer, decoder func(*http.Request) go
 			}
 			id = v
 		}
+		contentType = r.Header.Get("Content-Type")
+		if contentType == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("contentType", "header"))
+		}
 		if err != nil {
 			return payload, err
 		}
-		payload = NewSetBookCoverPayload(id)
+		payload = NewSetBookCoverPayload(id, contentType)
 
 		return payload, nil
 	}
@@ -463,37 +523,57 @@ func EncodeSetBookCoverError(encoder func(context.Context, http.ResponseWriter) 
 			return encodeError(ctx, w, v)
 		}
 		switch en.GoaErrorName() {
-		case "internal_error":
-			var res books.InternalError
-			errors.As(v, &res)
-			enc := encoder(ctx, w)
-			body := res
-			w.Header().Set("goa-error", res.GoaErrorName())
-			w.WriteHeader(http.StatusInternalServerError)
-			return enc.Encode(body)
-		case "invalid_image_format":
-			var res books.InvalidImageFormat
-			errors.As(v, &res)
-			enc := encoder(ctx, w)
-			body := res
-			w.Header().Set("goa-error", res.GoaErrorName())
-			w.WriteHeader(http.StatusBadRequest)
-			return enc.Encode(body)
 		case "not_found":
-			var res books.NotFound
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewSetBookCoverNotFoundResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusNotFound)
 			return enc.Encode(body)
-		case "payload_too_large":
-			var res books.PayloadTooLarge
+		case "invalid_image_format":
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewSetBookCoverInvalidImageFormatResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "payload_too_large":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewSetBookCoverPayloadTooLargeResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusRequestEntityTooLarge)
+			return enc.Encode(body)
+		case "internal_error":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewSetBookCoverInternalErrorResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)
@@ -548,21 +628,31 @@ func EncodeDeleteBookError(encoder func(context.Context, http.ResponseWriter) go
 			return encodeError(ctx, w, v)
 		}
 		switch en.GoaErrorName() {
-		case "internal_error":
-			var res books.InternalError
-			errors.As(v, &res)
-			enc := encoder(ctx, w)
-			body := res
-			w.Header().Set("goa-error", res.GoaErrorName())
-			w.WriteHeader(http.StatusInternalServerError)
-			return enc.Encode(body)
 		case "not_found":
-			var res books.NotFound
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewDeleteBookNotFoundResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "internal_error":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewDeleteBookInternalErrorResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)

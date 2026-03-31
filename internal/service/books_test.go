@@ -13,6 +13,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	goa "goa.design/goa/v3/pkg"
 
 	books "github.com/Velin-Todorov/zetta-task/gen/books"
 	"github.com/Velin-Todorov/zetta-task/internal/db"
@@ -22,6 +23,14 @@ import (
 	"github.com/Velin-Todorov/zetta-task/internal/storage"
 	storageMocks "github.com/Velin-Todorov/zetta-task/internal/storage/mocks"
 )
+
+func assertServiceError(t *testing.T, err error, name string) {
+	t.Helper()
+	var svcErr *goa.ServiceError
+	if assert.ErrorAs(t, err, &svcErr) {
+		assert.Equal(t, name, svcErr.Name)
+	}
+}
 
 func DBMock() *db.Book {
 	return &db.Book{
@@ -75,7 +84,7 @@ func TestGetBooks_RepoError(t *testing.T) {
 	_, err := svc.GetBooks(t.Context(), &books.GetBooksPayload{})
 
 	assert.Error(t, err)
-	assert.IsType(t, books.InternalError(""), err)
+	assertServiceError(t, err, "internal_error")
 }
 
 func TestGetBooks_DefaultLimitAndOffset(t *testing.T) {
@@ -126,6 +135,103 @@ func TestGetBooks_PassesFilters(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestGetBooks_FilterByPublishedAt(t *testing.T) {
+	repo := repoMocks.NewBookRepository(t)
+	store := storageMocks.NewImageStore(t)
+
+	repo.EXPECT().GetBooks(mock.Anything, mock.MatchedBy(func(f repository.BookFilter) bool {
+		return f.PublishedAt != nil && *f.PublishedAt == "1965-08-01"
+	})).Return([]db.Book{*DBMock()}, nil)
+
+	svc := bookstore.NewBooks(repo, store)
+	result, err := svc.GetBooks(t.Context(), &books.GetBooksPayload{
+		PublishedAt: ptr("1965-08-01"),
+	})
+
+	assert.NoError(t, err)
+	assert.Len(t, result, 1)
+}
+
+func TestGetBooks_FilterByPublishedAfter(t *testing.T) {
+	repo := repoMocks.NewBookRepository(t)
+	store := storageMocks.NewImageStore(t)
+
+	repo.EXPECT().GetBooks(mock.Anything, mock.MatchedBy(func(f repository.BookFilter) bool {
+		return f.PublishedAfter != nil && *f.PublishedAfter == "1960-01-01"
+	})).Return([]db.Book{*DBMock()}, nil)
+
+	svc := bookstore.NewBooks(repo, store)
+	result, err := svc.GetBooks(t.Context(), &books.GetBooksPayload{
+		PublishedAfter: ptr("1960-01-01"),
+	})
+
+	assert.NoError(t, err)
+	assert.Len(t, result, 1)
+}
+
+func TestGetBooks_FilterByPublishedBefore(t *testing.T) {
+	repo := repoMocks.NewBookRepository(t)
+	store := storageMocks.NewImageStore(t)
+
+	repo.EXPECT().GetBooks(mock.Anything, mock.MatchedBy(func(f repository.BookFilter) bool {
+		return f.PublishedBefore != nil && *f.PublishedBefore == "1970-01-01"
+	})).Return([]db.Book{*DBMock()}, nil)
+
+	svc := bookstore.NewBooks(repo, store)
+	result, err := svc.GetBooks(t.Context(), &books.GetBooksPayload{
+		PublishedBefore: ptr("1970-01-01"),
+	})
+
+	assert.NoError(t, err)
+	assert.Len(t, result, 1)
+}
+
+func TestGetBooks_FilterByDateRange(t *testing.T) {
+	repo := repoMocks.NewBookRepository(t)
+	store := storageMocks.NewImageStore(t)
+
+	repo.EXPECT().GetBooks(mock.Anything, mock.MatchedBy(func(f repository.BookFilter) bool {
+		return f.PublishedAfter != nil && *f.PublishedAfter == "1960-01-01" &&
+			f.PublishedBefore != nil && *f.PublishedBefore == "1970-01-01"
+	})).Return([]db.Book{*DBMock()}, nil)
+
+	svc := bookstore.NewBooks(repo, store)
+	result, err := svc.GetBooks(t.Context(), &books.GetBooksPayload{
+		PublishedAfter:  ptr("1960-01-01"),
+		PublishedBefore: ptr("1970-01-01"),
+	})
+
+	assert.NoError(t, err)
+	assert.Len(t, result, 1)
+}
+
+func TestGetBooks_AllFilters(t *testing.T) {
+	repo := repoMocks.NewBookRepository(t)
+	store := storageMocks.NewImageStore(t)
+
+	repo.EXPECT().GetBooks(mock.Anything, mock.MatchedBy(func(f repository.BookFilter) bool {
+		return *f.Title == "Dune" &&
+			*f.Author == "Frank Herbert" &&
+			*f.PublishedAfter == "1960-01-01" &&
+			*f.PublishedBefore == "1970-01-01" &&
+			f.Limit == 10 &&
+			f.Offset == 5
+	})).Return([]db.Book{*DBMock()}, nil)
+
+	svc := bookstore.NewBooks(repo, store)
+	result, err := svc.GetBooks(t.Context(), &books.GetBooksPayload{
+		Title:          ptr("Dune"),
+		Author:         ptr("Frank Herbert"),
+		PublishedAfter: ptr("1960-01-01"),
+		PublishedBefore: ptr("1970-01-01"),
+		Limit:          ptr(uint64(10)),
+		Offset:         ptr(uint64(5)),
+	})
+
+	assert.NoError(t, err)
+	assert.Len(t, result, 1)
+}
+
 func TestGetBook_Success(t *testing.T) {
 	repo := repoMocks.NewBookRepository(t)
 	store := storageMocks.NewImageStore(t)
@@ -151,7 +257,7 @@ func TestGetBook_NotFound(t *testing.T) {
 	_, err := svc.GetBook(t.Context(), &books.GetBookPayload{ID: 999})
 
 	assert.Error(t, err)
-	assert.IsType(t, books.NotFound(""), err)
+	assertServiceError(t, err, "not_found")
 }
 
 func TestGetBook_InternalError(t *testing.T) {
@@ -164,7 +270,7 @@ func TestGetBook_InternalError(t *testing.T) {
 	_, err := svc.GetBook(t.Context(), &books.GetBookPayload{ID: 1})
 
 	assert.Error(t, err)
-	assert.IsType(t, books.InternalError(""), err)
+	assertServiceError(t, err, "internal_error")
 }
 
 // --- CreateBook ---
@@ -201,7 +307,7 @@ func TestCreateBook_InvalidDate(t *testing.T) {
 	})
 
 	assert.Error(t, err)
-	assert.IsType(t, books.InvalidInput(""), err)
+	assertServiceError(t, err, "invalid_input")
 }
 
 func TestCreateBook_Conflict(t *testing.T) {
@@ -218,7 +324,7 @@ func TestCreateBook_Conflict(t *testing.T) {
 	})
 
 	assert.Error(t, err)
-	assert.IsType(t, books.Conflict(""), err)
+	assertServiceError(t, err, "conflict")
 }
 
 func TestCreateBook_InternalError(t *testing.T) {
@@ -235,7 +341,7 @@ func TestCreateBook_InternalError(t *testing.T) {
 	})
 
 	assert.Error(t, err)
-	assert.IsType(t, books.InternalError(""), err)
+	assertServiceError(t, err, "internal_error")
 }
 
 func TestUpdateBook_Success(t *testing.T) {
@@ -278,7 +384,7 @@ func TestUpdateBook_NotFound(t *testing.T) {
 	})
 
 	assert.Error(t, err)
-	assert.IsType(t, books.NotFound(""), err)
+	assertServiceError(t, err, "not_found")
 }
 
 func TestUpdateBook_InvalidDate(t *testing.T) {
@@ -294,7 +400,7 @@ func TestUpdateBook_InvalidDate(t *testing.T) {
 	})
 
 	assert.Error(t, err)
-	assert.IsType(t, books.InvalidInput(""), err)
+	assertServiceError(t, err, "invalid_input")
 }
 
 func TestUpdateBook_Conflict(t *testing.T) {
@@ -311,7 +417,7 @@ func TestUpdateBook_Conflict(t *testing.T) {
 	})
 
 	assert.Error(t, err)
-	assert.IsType(t, books.Conflict(""), err)
+	assertServiceError(t, err, "conflict")
 }
 
 func multipartBody(t *testing.T, fieldName, fileName, content string) (io.ReadCloser, string) {
@@ -358,7 +464,7 @@ func TestSetBookCover_InvalidFormat(t *testing.T) {
 	_, err := svc.SetBookCover(t.Context(), &books.SetBookCoverPayload{ID: 1, ContentType: contentType}, body)
 
 	assert.Error(t, err)
-	assert.IsType(t, books.InvalidImageFormat(""), err)
+	assertServiceError(t, err, "invalid_image_format")
 }
 
 func TestSetBookCover_TooLarge(t *testing.T) {
@@ -374,7 +480,7 @@ func TestSetBookCover_TooLarge(t *testing.T) {
 	_, err := svc.SetBookCover(t.Context(), &books.SetBookCoverPayload{ID: 1, ContentType: contentType}, body)
 
 	assert.Error(t, err)
-	assert.IsType(t, books.PayloadTooLarge(""), err)
+	assertServiceError(t, err, "payload_too_large")
 }
 
 func TestSetBookCover_BookNotFound(t *testing.T) {
@@ -389,7 +495,7 @@ func TestSetBookCover_BookNotFound(t *testing.T) {
 	_, err := svc.SetBookCover(t.Context(), &books.SetBookCoverPayload{ID: 999, ContentType: contentType}, body)
 
 	assert.Error(t, err)
-	assert.IsType(t, books.NotFound(""), err)
+	assertServiceError(t, err, "not_found")
 }
 
 func TestDeleteBook_Success(t *testing.T) {
@@ -415,7 +521,7 @@ func TestDeleteBook_NotFound(t *testing.T) {
 	err := svc.DeleteBook(t.Context(), &books.DeleteBookPayload{ID: 999})
 
 	assert.Error(t, err)
-	assert.IsType(t, books.NotFound(""), err)
+	assertServiceError(t, err, "not_found")
 }
 
 func TestDeleteBook_InternalError(t *testing.T) {
@@ -429,5 +535,5 @@ func TestDeleteBook_InternalError(t *testing.T) {
 	err := svc.DeleteBook(t.Context(), &books.DeleteBookPayload{ID: 1})
 
 	assert.Error(t, err)
-	assert.IsType(t, books.InternalError(""), err)
+	assertServiceError(t, err, "internal_error")
 }

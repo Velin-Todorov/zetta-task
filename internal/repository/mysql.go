@@ -79,7 +79,7 @@ func (r *mysqlBookRepository) GetBook(ctx context.Context, id int64) (*db.Book, 
 func (r *mysqlBookRepository) CreateBook(ctx context.Context, params db.CreateBookParams) (*db.Book, error) {
 	res, err := r.queries.CreateBook(ctx, params)
 	if err != nil {
-		return nil, err
+		return nil, wrapMySQLError(err)
 	}
 
 	insertedId, err := res.LastInsertId()
@@ -98,12 +98,12 @@ func (r *mysqlBookRepository) CreateBook(ctx context.Context, params db.CreateBo
 func (r *mysqlBookRepository) UpdateBook(ctx context.Context, params db.UpdateBookParams) (*db.Book, error) {
 	_, err := r.queries.UpdateBook(ctx, params)
 	if err != nil {
-		return nil, err
+		return nil, wrapMySQLError(err)
 	}
 
 	book, err := r.queries.GetBook(ctx, params.ID)
 	if err != nil {
-		return nil, err
+		return nil, wrapMySQLError(err)
 	}
 
 	return &book, nil

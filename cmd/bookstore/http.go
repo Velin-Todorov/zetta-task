@@ -50,7 +50,7 @@ func handleHTTPServer(ctx context.Context, u *url.URL, booksEndpoints *books.End
 	)
 	{	
 		eh := errorHandler(ctx)
-		booksServer = bookssvr.New(booksEndpoints, mux, dec, enc, eh, nil, nil)
+		booksServer = bookssvr.New(booksEndpoints, mux, dec, enc, eh, nil, nil, nil, nil)
 	}
 
 	// Configure the mux.

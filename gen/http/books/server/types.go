@@ -20,7 +20,7 @@ type CreateBookRequestBody struct {
 	// Author of the book
 	Author *string `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
 	// Publication time of the book
-	PublishedAt *string `form:"published_at,omitempty" json:"published_at,omitempty" xml:"published_at,omitempty"`
+	PublishedAt *string `form:"publishedAt,omitempty" json:"publishedAt,omitempty" xml:"publishedAt,omitempty"`
 }
 
 // UpdateBookRequestBody is the type of the "books" service "updateBook"
@@ -31,7 +31,7 @@ type UpdateBookRequestBody struct {
 	// Author of the book
 	Author *string `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
 	// Publication time of the book
-	PublishedAt *string `form:"published_at,omitempty" json:"published_at,omitempty" xml:"published_at,omitempty"`
+	PublishedAt *string `form:"publishedAt,omitempty" json:"publishedAt,omitempty" xml:"publishedAt,omitempty"`
 }
 
 // GetBooksResponseBody is the type of the "books" service "getBooks" endpoint
@@ -45,7 +45,7 @@ type GetBookResponseBody struct {
 	Title       string  `form:"title" json:"title" xml:"title"`
 	Author      string  `form:"author" json:"author" xml:"author"`
 	CoverURL    *string `form:"cover_url,omitempty" json:"cover_url,omitempty" xml:"cover_url,omitempty"`
-	PublishedAt string  `form:"published_at" json:"published_at" xml:"published_at"`
+	PublishedAt string  `form:"publishedAt" json:"publishedAt" xml:"publishedAt"`
 }
 
 // CreateBookResponseBody is the type of the "books" service "createBook"
@@ -55,7 +55,7 @@ type CreateBookResponseBody struct {
 	Title       string  `form:"title" json:"title" xml:"title"`
 	Author      string  `form:"author" json:"author" xml:"author"`
 	CoverURL    *string `form:"cover_url,omitempty" json:"cover_url,omitempty" xml:"cover_url,omitempty"`
-	PublishedAt string  `form:"published_at" json:"published_at" xml:"published_at"`
+	PublishedAt string  `form:"publishedAt" json:"publishedAt" xml:"publishedAt"`
 }
 
 // UpdateBookResponseBody is the type of the "books" service "updateBook"
@@ -65,7 +65,7 @@ type UpdateBookResponseBody struct {
 	Title       string  `form:"title" json:"title" xml:"title"`
 	Author      string  `form:"author" json:"author" xml:"author"`
 	CoverURL    *string `form:"cover_url,omitempty" json:"cover_url,omitempty" xml:"cover_url,omitempty"`
-	PublishedAt string  `form:"published_at" json:"published_at" xml:"published_at"`
+	PublishedAt string  `form:"publishedAt" json:"publishedAt" xml:"publishedAt"`
 }
 
 // SetBookCoverResponseBody is the type of the "books" service "setBookCover"
@@ -75,7 +75,314 @@ type SetBookCoverResponseBody struct {
 	Title       string  `form:"title" json:"title" xml:"title"`
 	Author      string  `form:"author" json:"author" xml:"author"`
 	CoverURL    *string `form:"cover_url,omitempty" json:"cover_url,omitempty" xml:"cover_url,omitempty"`
-	PublishedAt string  `form:"published_at" json:"published_at" xml:"published_at"`
+	PublishedAt string  `form:"publishedAt" json:"publishedAt" xml:"publishedAt"`
+}
+
+// GetBooksNotFoundResponseBody is the type of the "books" service "getBooks"
+// endpoint HTTP response body for the "not_found" error.
+type GetBooksNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// GetBooksInternalErrorResponseBody is the type of the "books" service
+// "getBooks" endpoint HTTP response body for the "internal_error" error.
+type GetBooksInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// GetBookNotFoundResponseBody is the type of the "books" service "getBook"
+// endpoint HTTP response body for the "not_found" error.
+type GetBookNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// GetBookInternalErrorResponseBody is the type of the "books" service
+// "getBook" endpoint HTTP response body for the "internal_error" error.
+type GetBookInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CreateBookConflictResponseBody is the type of the "books" service
+// "createBook" endpoint HTTP response body for the "conflict" error.
+type CreateBookConflictResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CreateBookInvalidInputResponseBody is the type of the "books" service
+// "createBook" endpoint HTTP response body for the "invalid_input" error.
+type CreateBookInvalidInputResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CreateBookInternalErrorResponseBody is the type of the "books" service
+// "createBook" endpoint HTTP response body for the "internal_error" error.
+type CreateBookInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UpdateBookNotFoundResponseBody is the type of the "books" service
+// "updateBook" endpoint HTTP response body for the "not_found" error.
+type UpdateBookNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UpdateBookConflictResponseBody is the type of the "books" service
+// "updateBook" endpoint HTTP response body for the "conflict" error.
+type UpdateBookConflictResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UpdateBookInvalidInputResponseBody is the type of the "books" service
+// "updateBook" endpoint HTTP response body for the "invalid_input" error.
+type UpdateBookInvalidInputResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UpdateBookInternalErrorResponseBody is the type of the "books" service
+// "updateBook" endpoint HTTP response body for the "internal_error" error.
+type UpdateBookInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// SetBookCoverNotFoundResponseBody is the type of the "books" service
+// "setBookCover" endpoint HTTP response body for the "not_found" error.
+type SetBookCoverNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// SetBookCoverInvalidImageFormatResponseBody is the type of the "books"
+// service "setBookCover" endpoint HTTP response body for the
+// "invalid_image_format" error.
+type SetBookCoverInvalidImageFormatResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// SetBookCoverPayloadTooLargeResponseBody is the type of the "books" service
+// "setBookCover" endpoint HTTP response body for the "payload_too_large" error.
+type SetBookCoverPayloadTooLargeResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// SetBookCoverInternalErrorResponseBody is the type of the "books" service
+// "setBookCover" endpoint HTTP response body for the "internal_error" error.
+type SetBookCoverInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteBookNotFoundResponseBody is the type of the "books" service
+// "deleteBook" endpoint HTTP response body for the "not_found" error.
+type DeleteBookNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteBookInternalErrorResponseBody is the type of the "books" service
+// "deleteBook" endpoint HTTP response body for the "internal_error" error.
+type DeleteBookInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
 // BookResponse is used to define fields on response body types.
@@ -84,7 +391,7 @@ type BookResponse struct {
 	Title       string  `form:"title" json:"title" xml:"title"`
 	Author      string  `form:"author" json:"author" xml:"author"`
 	CoverURL    *string `form:"cover_url,omitempty" json:"cover_url,omitempty" xml:"cover_url,omitempty"`
-	PublishedAt string  `form:"published_at" json:"published_at" xml:"published_at"`
+	PublishedAt string  `form:"publishedAt" json:"publishedAt" xml:"publishedAt"`
 }
 
 // NewGetBooksResponseBody builds the HTTP response body from the result of the
@@ -153,6 +460,244 @@ func NewSetBookCoverResponseBody(res *books.Book) *SetBookCoverResponseBody {
 	return body
 }
 
+// NewGetBooksNotFoundResponseBody builds the HTTP response body from the
+// result of the "getBooks" endpoint of the "books" service.
+func NewGetBooksNotFoundResponseBody(res *goa.ServiceError) *GetBooksNotFoundResponseBody {
+	body := &GetBooksNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewGetBooksInternalErrorResponseBody builds the HTTP response body from the
+// result of the "getBooks" endpoint of the "books" service.
+func NewGetBooksInternalErrorResponseBody(res *goa.ServiceError) *GetBooksInternalErrorResponseBody {
+	body := &GetBooksInternalErrorResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewGetBookNotFoundResponseBody builds the HTTP response body from the result
+// of the "getBook" endpoint of the "books" service.
+func NewGetBookNotFoundResponseBody(res *goa.ServiceError) *GetBookNotFoundResponseBody {
+	body := &GetBookNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewGetBookInternalErrorResponseBody builds the HTTP response body from the
+// result of the "getBook" endpoint of the "books" service.
+func NewGetBookInternalErrorResponseBody(res *goa.ServiceError) *GetBookInternalErrorResponseBody {
+	body := &GetBookInternalErrorResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCreateBookConflictResponseBody builds the HTTP response body from the
+// result of the "createBook" endpoint of the "books" service.
+func NewCreateBookConflictResponseBody(res *goa.ServiceError) *CreateBookConflictResponseBody {
+	body := &CreateBookConflictResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCreateBookInvalidInputResponseBody builds the HTTP response body from the
+// result of the "createBook" endpoint of the "books" service.
+func NewCreateBookInvalidInputResponseBody(res *goa.ServiceError) *CreateBookInvalidInputResponseBody {
+	body := &CreateBookInvalidInputResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCreateBookInternalErrorResponseBody builds the HTTP response body from
+// the result of the "createBook" endpoint of the "books" service.
+func NewCreateBookInternalErrorResponseBody(res *goa.ServiceError) *CreateBookInternalErrorResponseBody {
+	body := &CreateBookInternalErrorResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUpdateBookNotFoundResponseBody builds the HTTP response body from the
+// result of the "updateBook" endpoint of the "books" service.
+func NewUpdateBookNotFoundResponseBody(res *goa.ServiceError) *UpdateBookNotFoundResponseBody {
+	body := &UpdateBookNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUpdateBookConflictResponseBody builds the HTTP response body from the
+// result of the "updateBook" endpoint of the "books" service.
+func NewUpdateBookConflictResponseBody(res *goa.ServiceError) *UpdateBookConflictResponseBody {
+	body := &UpdateBookConflictResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUpdateBookInvalidInputResponseBody builds the HTTP response body from the
+// result of the "updateBook" endpoint of the "books" service.
+func NewUpdateBookInvalidInputResponseBody(res *goa.ServiceError) *UpdateBookInvalidInputResponseBody {
+	body := &UpdateBookInvalidInputResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUpdateBookInternalErrorResponseBody builds the HTTP response body from
+// the result of the "updateBook" endpoint of the "books" service.
+func NewUpdateBookInternalErrorResponseBody(res *goa.ServiceError) *UpdateBookInternalErrorResponseBody {
+	body := &UpdateBookInternalErrorResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewSetBookCoverNotFoundResponseBody builds the HTTP response body from the
+// result of the "setBookCover" endpoint of the "books" service.
+func NewSetBookCoverNotFoundResponseBody(res *goa.ServiceError) *SetBookCoverNotFoundResponseBody {
+	body := &SetBookCoverNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewSetBookCoverInvalidImageFormatResponseBody builds the HTTP response body
+// from the result of the "setBookCover" endpoint of the "books" service.
+func NewSetBookCoverInvalidImageFormatResponseBody(res *goa.ServiceError) *SetBookCoverInvalidImageFormatResponseBody {
+	body := &SetBookCoverInvalidImageFormatResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewSetBookCoverPayloadTooLargeResponseBody builds the HTTP response body
+// from the result of the "setBookCover" endpoint of the "books" service.
+func NewSetBookCoverPayloadTooLargeResponseBody(res *goa.ServiceError) *SetBookCoverPayloadTooLargeResponseBody {
+	body := &SetBookCoverPayloadTooLargeResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewSetBookCoverInternalErrorResponseBody builds the HTTP response body from
+// the result of the "setBookCover" endpoint of the "books" service.
+func NewSetBookCoverInternalErrorResponseBody(res *goa.ServiceError) *SetBookCoverInternalErrorResponseBody {
+	body := &SetBookCoverInternalErrorResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteBookNotFoundResponseBody builds the HTTP response body from the
+// result of the "deleteBook" endpoint of the "books" service.
+func NewDeleteBookNotFoundResponseBody(res *goa.ServiceError) *DeleteBookNotFoundResponseBody {
+	body := &DeleteBookNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteBookInternalErrorResponseBody builds the HTTP response body from
+// the result of the "deleteBook" endpoint of the "books" service.
+func NewDeleteBookInternalErrorResponseBody(res *goa.ServiceError) *DeleteBookInternalErrorResponseBody {
+	body := &DeleteBookInternalErrorResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewGetBooksPayload builds a books service getBooks endpoint payload.
 func NewGetBooksPayload(title *string, author *string, publishedAt *string, publishedAfter *string, publishedBefore *string, limit *uint64, offset *uint64) *books.GetBooksPayload {
 	v := &books.GetBooksPayload{}
@@ -199,9 +744,10 @@ func NewUpdateBookPayload(body *UpdateBookRequestBody, id int64) *books.UpdateBo
 }
 
 // NewSetBookCoverPayload builds a books service setBookCover endpoint payload.
-func NewSetBookCoverPayload(id int64) *books.SetBookCoverPayload {
+func NewSetBookCoverPayload(id int64, contentType string) *books.SetBookCoverPayload {
 	v := &books.SetBookCoverPayload{}
 	v.ID = id
+	v.ContentType = contentType
 
 	return v
 }
@@ -224,10 +770,10 @@ func ValidateCreateBookRequestBody(body *CreateBookRequestBody) (err error) {
 		err = goa.MergeErrors(err, goa.MissingFieldError("author", "body"))
 	}
 	if body.PublishedAt == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("published_at", "body"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("publishedAt", "body"))
 	}
 	if body.PublishedAt != nil {
-		err = goa.MergeErrors(err, goa.ValidateFormat("body.published_at", *body.PublishedAt, goa.FormatDate))
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.publishedAt", *body.PublishedAt, goa.FormatDate))
 	}
 	return
 }
@@ -236,7 +782,7 @@ func ValidateCreateBookRequestBody(body *CreateBookRequestBody) (err error) {
 // UpdateBookRequestBody
 func ValidateUpdateBookRequestBody(body *UpdateBookRequestBody) (err error) {
 	if body.PublishedAt != nil {
-		err = goa.MergeErrors(err, goa.ValidateFormat("body.published_at", *body.PublishedAt, goa.FormatDate))
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.publishedAt", *body.PublishedAt, goa.FormatDate))
 	}
 	return
 }

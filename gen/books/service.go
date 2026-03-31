@@ -10,6 +10,8 @@ package books
 import (
 	"context"
 	"io"
+
+	goa "goa.design/goa/v3/pkg"
 )
 
 // Service that returns data about books
@@ -91,6 +93,8 @@ type GetBooksPayload struct {
 type SetBookCoverPayload struct {
 	// ID of the book
 	ID int64
+	// Content-Type header
+	ContentType string
 }
 
 // UpdateBookPayload is the payload type of the books service updateBook method.
@@ -105,122 +109,32 @@ type UpdateBookPayload struct {
 	PublishedAt *string
 }
 
-// Book already exists
-type Conflict string
-
-// Internal server error
-type InternalError string
-
-// Unsupported image format
-type InvalidImageFormat string
-
-// Invalid input
-type InvalidInput string
-
-// Book not found
-type NotFound string
-
-// File size exceeds limit
-type PayloadTooLarge string
-
-// Error returns an error description.
-func (e Conflict) Error() string {
-	return "Book already exists"
+// MakeNotFound builds a goa.ServiceError from an error.
+func MakeNotFound(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "not_found", false, false, false)
 }
 
-// ErrorName returns "conflict".
-//
-// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
-func (e Conflict) ErrorName() string {
-	return e.GoaErrorName()
+// MakeInvalidInput builds a goa.ServiceError from an error.
+func MakeInvalidInput(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "invalid_input", false, false, false)
 }
 
-// GoaErrorName returns "conflict".
-func (e Conflict) GoaErrorName() string {
-	return "conflict"
+// MakeInvalidImageFormat builds a goa.ServiceError from an error.
+func MakeInvalidImageFormat(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "invalid_image_format", false, false, false)
 }
 
-// Error returns an error description.
-func (e InternalError) Error() string {
-	return "Internal server error"
+// MakePayloadTooLarge builds a goa.ServiceError from an error.
+func MakePayloadTooLarge(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "payload_too_large", false, false, false)
 }
 
-// ErrorName returns "internal_error".
-//
-// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
-func (e InternalError) ErrorName() string {
-	return e.GoaErrorName()
+// MakeConflict builds a goa.ServiceError from an error.
+func MakeConflict(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "conflict", false, false, false)
 }
 
-// GoaErrorName returns "internal_error".
-func (e InternalError) GoaErrorName() string {
-	return "internal_error"
-}
-
-// Error returns an error description.
-func (e InvalidImageFormat) Error() string {
-	return "Unsupported image format"
-}
-
-// ErrorName returns "invalid_image_format".
-//
-// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
-func (e InvalidImageFormat) ErrorName() string {
-	return e.GoaErrorName()
-}
-
-// GoaErrorName returns "invalid_image_format".
-func (e InvalidImageFormat) GoaErrorName() string {
-	return "invalid_image_format"
-}
-
-// Error returns an error description.
-func (e InvalidInput) Error() string {
-	return "Invalid input"
-}
-
-// ErrorName returns "invalid_input".
-//
-// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
-func (e InvalidInput) ErrorName() string {
-	return e.GoaErrorName()
-}
-
-// GoaErrorName returns "invalid_input".
-func (e InvalidInput) GoaErrorName() string {
-	return "invalid_input"
-}
-
-// Error returns an error description.
-func (e NotFound) Error() string {
-	return "Book not found"
-}
-
-// ErrorName returns "not_found".
-//
-// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
-func (e NotFound) ErrorName() string {
-	return e.GoaErrorName()
-}
-
-// GoaErrorName returns "not_found".
-func (e NotFound) GoaErrorName() string {
-	return "not_found"
-}
-
-// Error returns an error description.
-func (e PayloadTooLarge) Error() string {
-	return "File size exceeds limit"
-}
-
-// ErrorName returns "payload_too_large".
-//
-// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
-func (e PayloadTooLarge) ErrorName() string {
-	return e.GoaErrorName()
-}
-
-// GoaErrorName returns "payload_too_large".
-func (e PayloadTooLarge) GoaErrorName() string {
-	return "payload_too_large"
+// MakeInternalError builds a goa.ServiceError from an error.
+func MakeInternalError(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "internal_error", false, false, false)
 }

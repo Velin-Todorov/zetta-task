@@ -20,7 +20,7 @@ type CreateBookRequestBody struct {
 	// Author of the book
 	Author string `form:"author" json:"author" xml:"author"`
 	// Publication time of the book
-	PublishedAt string `form:"published_at" json:"published_at" xml:"published_at"`
+	PublishedAt string `form:"publishedAt" json:"publishedAt" xml:"publishedAt"`
 }
 
 // UpdateBookRequestBody is the type of the "books" service "updateBook"
@@ -31,7 +31,7 @@ type UpdateBookRequestBody struct {
 	// Author of the book
 	Author *string `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
 	// Publication time of the book
-	PublishedAt *string `form:"published_at,omitempty" json:"published_at,omitempty" xml:"published_at,omitempty"`
+	PublishedAt *string `form:"publishedAt,omitempty" json:"publishedAt,omitempty" xml:"publishedAt,omitempty"`
 }
 
 // GetBookResponseBody is the type of the "books" service "getBook" endpoint
@@ -41,7 +41,7 @@ type GetBookResponseBody struct {
 	Title       *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	Author      *string `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
 	CoverURL    *string `form:"cover_url,omitempty" json:"cover_url,omitempty" xml:"cover_url,omitempty"`
-	PublishedAt *string `form:"published_at,omitempty" json:"published_at,omitempty" xml:"published_at,omitempty"`
+	PublishedAt *string `form:"publishedAt,omitempty" json:"publishedAt,omitempty" xml:"publishedAt,omitempty"`
 }
 
 // CreateBookResponseBody is the type of the "books" service "createBook"
@@ -51,7 +51,7 @@ type CreateBookResponseBody struct {
 	Title       *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	Author      *string `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
 	CoverURL    *string `form:"cover_url,omitempty" json:"cover_url,omitempty" xml:"cover_url,omitempty"`
-	PublishedAt *string `form:"published_at,omitempty" json:"published_at,omitempty" xml:"published_at,omitempty"`
+	PublishedAt *string `form:"publishedAt,omitempty" json:"publishedAt,omitempty" xml:"publishedAt,omitempty"`
 }
 
 // UpdateBookResponseBody is the type of the "books" service "updateBook"
@@ -61,7 +61,7 @@ type UpdateBookResponseBody struct {
 	Title       *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	Author      *string `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
 	CoverURL    *string `form:"cover_url,omitempty" json:"cover_url,omitempty" xml:"cover_url,omitempty"`
-	PublishedAt *string `form:"published_at,omitempty" json:"published_at,omitempty" xml:"published_at,omitempty"`
+	PublishedAt *string `form:"publishedAt,omitempty" json:"publishedAt,omitempty" xml:"publishedAt,omitempty"`
 }
 
 // SetBookCoverResponseBody is the type of the "books" service "setBookCover"
@@ -71,7 +71,314 @@ type SetBookCoverResponseBody struct {
 	Title       *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	Author      *string `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
 	CoverURL    *string `form:"cover_url,omitempty" json:"cover_url,omitempty" xml:"cover_url,omitempty"`
-	PublishedAt *string `form:"published_at,omitempty" json:"published_at,omitempty" xml:"published_at,omitempty"`
+	PublishedAt *string `form:"publishedAt,omitempty" json:"publishedAt,omitempty" xml:"publishedAt,omitempty"`
+}
+
+// GetBooksNotFoundResponseBody is the type of the "books" service "getBooks"
+// endpoint HTTP response body for the "not_found" error.
+type GetBooksNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// GetBooksInternalErrorResponseBody is the type of the "books" service
+// "getBooks" endpoint HTTP response body for the "internal_error" error.
+type GetBooksInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// GetBookNotFoundResponseBody is the type of the "books" service "getBook"
+// endpoint HTTP response body for the "not_found" error.
+type GetBookNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// GetBookInternalErrorResponseBody is the type of the "books" service
+// "getBook" endpoint HTTP response body for the "internal_error" error.
+type GetBookInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// CreateBookConflictResponseBody is the type of the "books" service
+// "createBook" endpoint HTTP response body for the "conflict" error.
+type CreateBookConflictResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// CreateBookInvalidInputResponseBody is the type of the "books" service
+// "createBook" endpoint HTTP response body for the "invalid_input" error.
+type CreateBookInvalidInputResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// CreateBookInternalErrorResponseBody is the type of the "books" service
+// "createBook" endpoint HTTP response body for the "internal_error" error.
+type CreateBookInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// UpdateBookNotFoundResponseBody is the type of the "books" service
+// "updateBook" endpoint HTTP response body for the "not_found" error.
+type UpdateBookNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// UpdateBookConflictResponseBody is the type of the "books" service
+// "updateBook" endpoint HTTP response body for the "conflict" error.
+type UpdateBookConflictResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// UpdateBookInvalidInputResponseBody is the type of the "books" service
+// "updateBook" endpoint HTTP response body for the "invalid_input" error.
+type UpdateBookInvalidInputResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// UpdateBookInternalErrorResponseBody is the type of the "books" service
+// "updateBook" endpoint HTTP response body for the "internal_error" error.
+type UpdateBookInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// SetBookCoverNotFoundResponseBody is the type of the "books" service
+// "setBookCover" endpoint HTTP response body for the "not_found" error.
+type SetBookCoverNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// SetBookCoverInvalidImageFormatResponseBody is the type of the "books"
+// service "setBookCover" endpoint HTTP response body for the
+// "invalid_image_format" error.
+type SetBookCoverInvalidImageFormatResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// SetBookCoverPayloadTooLargeResponseBody is the type of the "books" service
+// "setBookCover" endpoint HTTP response body for the "payload_too_large" error.
+type SetBookCoverPayloadTooLargeResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// SetBookCoverInternalErrorResponseBody is the type of the "books" service
+// "setBookCover" endpoint HTTP response body for the "internal_error" error.
+type SetBookCoverInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// DeleteBookNotFoundResponseBody is the type of the "books" service
+// "deleteBook" endpoint HTTP response body for the "not_found" error.
+type DeleteBookNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// DeleteBookInternalErrorResponseBody is the type of the "books" service
+// "deleteBook" endpoint HTTP response body for the "internal_error" error.
+type DeleteBookInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
 // BookResponse is used to define fields on response body types.
@@ -80,7 +387,7 @@ type BookResponse struct {
 	Title       *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	Author      *string `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
 	CoverURL    *string `form:"cover_url,omitempty" json:"cover_url,omitempty" xml:"cover_url,omitempty"`
-	PublishedAt *string `form:"published_at,omitempty" json:"published_at,omitempty" xml:"published_at,omitempty"`
+	PublishedAt *string `form:"publishedAt,omitempty" json:"publishedAt,omitempty" xml:"publishedAt,omitempty"`
 }
 
 // NewCreateBookRequestBody builds the HTTP request body from the payload of
@@ -120,17 +427,31 @@ func NewGetBooksBookOK(body []*BookResponse) []*books.Book {
 	return v
 }
 
-// NewGetBooksInternalError builds a books service getBooks endpoint
-// internal_error error.
-func NewGetBooksInternalError(body string) books.InternalError {
-	v := books.InternalError(body)
+// NewGetBooksNotFound builds a books service getBooks endpoint not_found error.
+func NewGetBooksNotFound(body *GetBooksNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
 
 	return v
 }
 
-// NewGetBooksNotFound builds a books service getBooks endpoint not_found error.
-func NewGetBooksNotFound(body string) books.NotFound {
-	v := books.NotFound(body)
+// NewGetBooksInternalError builds a books service getBooks endpoint
+// internal_error error.
+func NewGetBooksInternalError(body *GetBooksInternalErrorResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
 
 	return v
 }
@@ -149,17 +470,31 @@ func NewGetBookBookOK(body *GetBookResponseBody) *books.Book {
 	return v
 }
 
-// NewGetBookInternalError builds a books service getBook endpoint
-// internal_error error.
-func NewGetBookInternalError(body string) books.InternalError {
-	v := books.InternalError(body)
+// NewGetBookNotFound builds a books service getBook endpoint not_found error.
+func NewGetBookNotFound(body *GetBookNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
 
 	return v
 }
 
-// NewGetBookNotFound builds a books service getBook endpoint not_found error.
-func NewGetBookNotFound(body string) books.NotFound {
-	v := books.NotFound(body)
+// NewGetBookInternalError builds a books service getBook endpoint
+// internal_error error.
+func NewGetBookInternalError(body *GetBookInternalErrorResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
 
 	return v
 }
@@ -180,24 +515,45 @@ func NewCreateBookBookCreated(body *CreateBookResponseBody) *books.Book {
 
 // NewCreateBookConflict builds a books service createBook endpoint conflict
 // error.
-func NewCreateBookConflict(body string) books.Conflict {
-	v := books.Conflict(body)
-
-	return v
-}
-
-// NewCreateBookInternalError builds a books service createBook endpoint
-// internal_error error.
-func NewCreateBookInternalError(body string) books.InternalError {
-	v := books.InternalError(body)
+func NewCreateBookConflict(body *CreateBookConflictResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
 
 	return v
 }
 
 // NewCreateBookInvalidInput builds a books service createBook endpoint
 // invalid_input error.
-func NewCreateBookInvalidInput(body string) books.InvalidInput {
-	v := books.InvalidInput(body)
+func NewCreateBookInvalidInput(body *CreateBookInvalidInputResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewCreateBookInternalError builds a books service createBook endpoint
+// internal_error error.
+func NewCreateBookInternalError(body *CreateBookInternalErrorResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
 
 	return v
 }
@@ -216,34 +572,62 @@ func NewUpdateBookBookOK(body *UpdateBookResponseBody) *books.Book {
 	return v
 }
 
-// NewUpdateBookConflict builds a books service updateBook endpoint conflict
+// NewUpdateBookNotFound builds a books service updateBook endpoint not_found
 // error.
-func NewUpdateBookConflict(body string) books.Conflict {
-	v := books.Conflict(body)
+func NewUpdateBookNotFound(body *UpdateBookNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
 
 	return v
 }
 
-// NewUpdateBookInternalError builds a books service updateBook endpoint
-// internal_error error.
-func NewUpdateBookInternalError(body string) books.InternalError {
-	v := books.InternalError(body)
+// NewUpdateBookConflict builds a books service updateBook endpoint conflict
+// error.
+func NewUpdateBookConflict(body *UpdateBookConflictResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
 
 	return v
 }
 
 // NewUpdateBookInvalidInput builds a books service updateBook endpoint
 // invalid_input error.
-func NewUpdateBookInvalidInput(body string) books.InvalidInput {
-	v := books.InvalidInput(body)
+func NewUpdateBookInvalidInput(body *UpdateBookInvalidInputResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
 
 	return v
 }
 
-// NewUpdateBookNotFound builds a books service updateBook endpoint not_found
-// error.
-func NewUpdateBookNotFound(body string) books.NotFound {
-	v := books.NotFound(body)
+// NewUpdateBookInternalError builds a books service updateBook endpoint
+// internal_error error.
+func NewUpdateBookInternalError(body *UpdateBookInternalErrorResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
 
 	return v
 }
@@ -262,50 +646,92 @@ func NewSetBookCoverBookOK(body *SetBookCoverResponseBody) *books.Book {
 	return v
 }
 
-// NewSetBookCoverInternalError builds a books service setBookCover endpoint
-// internal_error error.
-func NewSetBookCoverInternalError(body string) books.InternalError {
-	v := books.InternalError(body)
+// NewSetBookCoverNotFound builds a books service setBookCover endpoint
+// not_found error.
+func NewSetBookCoverNotFound(body *SetBookCoverNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
 
 	return v
 }
 
 // NewSetBookCoverInvalidImageFormat builds a books service setBookCover
 // endpoint invalid_image_format error.
-func NewSetBookCoverInvalidImageFormat(body string) books.InvalidImageFormat {
-	v := books.InvalidImageFormat(body)
-
-	return v
-}
-
-// NewSetBookCoverNotFound builds a books service setBookCover endpoint
-// not_found error.
-func NewSetBookCoverNotFound(body string) books.NotFound {
-	v := books.NotFound(body)
+func NewSetBookCoverInvalidImageFormat(body *SetBookCoverInvalidImageFormatResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
 
 	return v
 }
 
 // NewSetBookCoverPayloadTooLarge builds a books service setBookCover endpoint
 // payload_too_large error.
-func NewSetBookCoverPayloadTooLarge(body string) books.PayloadTooLarge {
-	v := books.PayloadTooLarge(body)
+func NewSetBookCoverPayloadTooLarge(body *SetBookCoverPayloadTooLargeResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
 
 	return v
 }
 
-// NewDeleteBookInternalError builds a books service deleteBook endpoint
+// NewSetBookCoverInternalError builds a books service setBookCover endpoint
 // internal_error error.
-func NewDeleteBookInternalError(body string) books.InternalError {
-	v := books.InternalError(body)
+func NewSetBookCoverInternalError(body *SetBookCoverInternalErrorResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
 
 	return v
 }
 
 // NewDeleteBookNotFound builds a books service deleteBook endpoint not_found
 // error.
-func NewDeleteBookNotFound(body string) books.NotFound {
-	v := books.NotFound(body)
+func NewDeleteBookNotFound(body *DeleteBookNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewDeleteBookInternalError builds a books service deleteBook endpoint
+// internal_error error.
+func NewDeleteBookInternalError(body *DeleteBookInternalErrorResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
 
 	return v
 }
@@ -323,10 +749,10 @@ func ValidateGetBookResponseBody(body *GetBookResponseBody) (err error) {
 		err = goa.MergeErrors(err, goa.MissingFieldError("author", "body"))
 	}
 	if body.PublishedAt == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("published_at", "body"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("publishedAt", "body"))
 	}
 	if body.PublishedAt != nil {
-		err = goa.MergeErrors(err, goa.ValidateFormat("body.published_at", *body.PublishedAt, goa.FormatDate))
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.publishedAt", *body.PublishedAt, goa.FormatDate))
 	}
 	return
 }
@@ -344,10 +770,10 @@ func ValidateCreateBookResponseBody(body *CreateBookResponseBody) (err error) {
 		err = goa.MergeErrors(err, goa.MissingFieldError("author", "body"))
 	}
 	if body.PublishedAt == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("published_at", "body"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("publishedAt", "body"))
 	}
 	if body.PublishedAt != nil {
-		err = goa.MergeErrors(err, goa.ValidateFormat("body.published_at", *body.PublishedAt, goa.FormatDate))
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.publishedAt", *body.PublishedAt, goa.FormatDate))
 	}
 	return
 }
@@ -365,10 +791,10 @@ func ValidateUpdateBookResponseBody(body *UpdateBookResponseBody) (err error) {
 		err = goa.MergeErrors(err, goa.MissingFieldError("author", "body"))
 	}
 	if body.PublishedAt == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("published_at", "body"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("publishedAt", "body"))
 	}
 	if body.PublishedAt != nil {
-		err = goa.MergeErrors(err, goa.ValidateFormat("body.published_at", *body.PublishedAt, goa.FormatDate))
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.publishedAt", *body.PublishedAt, goa.FormatDate))
 	}
 	return
 }
@@ -386,10 +812,418 @@ func ValidateSetBookCoverResponseBody(body *SetBookCoverResponseBody) (err error
 		err = goa.MergeErrors(err, goa.MissingFieldError("author", "body"))
 	}
 	if body.PublishedAt == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("published_at", "body"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("publishedAt", "body"))
 	}
 	if body.PublishedAt != nil {
-		err = goa.MergeErrors(err, goa.ValidateFormat("body.published_at", *body.PublishedAt, goa.FormatDate))
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.publishedAt", *body.PublishedAt, goa.FormatDate))
+	}
+	return
+}
+
+// ValidateGetBooksNotFoundResponseBody runs the validations defined on
+// getBooks_not_found_response_body
+func ValidateGetBooksNotFoundResponseBody(body *GetBooksNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateGetBooksInternalErrorResponseBody runs the validations defined on
+// getBooks_internal_error_response_body
+func ValidateGetBooksInternalErrorResponseBody(body *GetBooksInternalErrorResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateGetBookNotFoundResponseBody runs the validations defined on
+// getBook_not_found_response_body
+func ValidateGetBookNotFoundResponseBody(body *GetBookNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateGetBookInternalErrorResponseBody runs the validations defined on
+// getBook_internal_error_response_body
+func ValidateGetBookInternalErrorResponseBody(body *GetBookInternalErrorResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateCreateBookConflictResponseBody runs the validations defined on
+// createBook_conflict_response_body
+func ValidateCreateBookConflictResponseBody(body *CreateBookConflictResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateCreateBookInvalidInputResponseBody runs the validations defined on
+// createBook_invalid_input_response_body
+func ValidateCreateBookInvalidInputResponseBody(body *CreateBookInvalidInputResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateCreateBookInternalErrorResponseBody runs the validations defined on
+// createBook_internal_error_response_body
+func ValidateCreateBookInternalErrorResponseBody(body *CreateBookInternalErrorResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateUpdateBookNotFoundResponseBody runs the validations defined on
+// updateBook_not_found_response_body
+func ValidateUpdateBookNotFoundResponseBody(body *UpdateBookNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateUpdateBookConflictResponseBody runs the validations defined on
+// updateBook_conflict_response_body
+func ValidateUpdateBookConflictResponseBody(body *UpdateBookConflictResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateUpdateBookInvalidInputResponseBody runs the validations defined on
+// updateBook_invalid_input_response_body
+func ValidateUpdateBookInvalidInputResponseBody(body *UpdateBookInvalidInputResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateUpdateBookInternalErrorResponseBody runs the validations defined on
+// updateBook_internal_error_response_body
+func ValidateUpdateBookInternalErrorResponseBody(body *UpdateBookInternalErrorResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateSetBookCoverNotFoundResponseBody runs the validations defined on
+// setBookCover_not_found_response_body
+func ValidateSetBookCoverNotFoundResponseBody(body *SetBookCoverNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateSetBookCoverInvalidImageFormatResponseBody runs the validations
+// defined on setBookCover_invalid_image_format_response_body
+func ValidateSetBookCoverInvalidImageFormatResponseBody(body *SetBookCoverInvalidImageFormatResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateSetBookCoverPayloadTooLargeResponseBody runs the validations defined
+// on setBookCover_payload_too_large_response_body
+func ValidateSetBookCoverPayloadTooLargeResponseBody(body *SetBookCoverPayloadTooLargeResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateSetBookCoverInternalErrorResponseBody runs the validations defined
+// on setBookCover_internal_error_response_body
+func ValidateSetBookCoverInternalErrorResponseBody(body *SetBookCoverInternalErrorResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateDeleteBookNotFoundResponseBody runs the validations defined on
+// deleteBook_not_found_response_body
+func ValidateDeleteBookNotFoundResponseBody(body *DeleteBookNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateDeleteBookInternalErrorResponseBody runs the validations defined on
+// deleteBook_internal_error_response_body
+func ValidateDeleteBookInternalErrorResponseBody(body *DeleteBookInternalErrorResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
 	}
 	return
 }
@@ -406,10 +1240,10 @@ func ValidateBookResponse(body *BookResponse) (err error) {
 		err = goa.MergeErrors(err, goa.MissingFieldError("author", "body"))
 	}
 	if body.PublishedAt == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("published_at", "body"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("publishedAt", "body"))
 	}
 	if body.PublishedAt != nil {
-		err = goa.MergeErrors(err, goa.ValidateFormat("body.published_at", *body.PublishedAt, goa.FormatDate))
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.publishedAt", *body.PublishedAt, goa.FormatDate))
 	}
 	return
 }

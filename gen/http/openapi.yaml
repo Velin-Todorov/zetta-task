@@ -3,7 +3,7 @@ info:
     title: Bookstore API
     description: An api that returns data about books in a bookstore
     version: 1.0.0
-host: localhost:80
+host: 0.0.0.0:8080
 consumes:
     - application/json
     - application/xml
@@ -32,7 +32,7 @@ paths:
                   required: false
                   type: string
                   minLength: 1
-                - name: published_at
+                - name: publishedAt
                   in: query
                   required: false
                   type: string
@@ -65,11 +65,11 @@ paths:
                 "404":
                     description: Not Found response.
                     schema:
-                        type: string
+                        $ref: '#/definitions/BooksGetBooksNotFoundResponseBody'
                 "500":
                     description: Internal Server Error response.
                     schema:
-                        type: string
+                        $ref: '#/definitions/BooksGetBooksInternalErrorResponseBody'
             schemes:
                 - http
         post:
@@ -88,7 +88,7 @@ paths:
                     required:
                         - title
                         - author
-                        - published_at
+                        - publishedAt
             responses:
                 "201":
                     description: Created response.
@@ -98,19 +98,19 @@ paths:
                             - id
                             - title
                             - author
-                            - published_at
+                            - publishedAt
                 "400":
                     description: Bad Request response.
                     schema:
-                        type: string
+                        $ref: '#/definitions/BooksCreateBookInvalidInputResponseBody'
                 "409":
                     description: Conflict response.
                     schema:
-                        type: string
+                        $ref: '#/definitions/BooksCreateBookConflictResponseBody'
                 "500":
                     description: Internal Server Error response.
                     schema:
-                        type: string
+                        $ref: '#/definitions/BooksCreateBookInternalErrorResponseBody'
             schemes:
                 - http
     /books/{id}:
@@ -137,15 +137,15 @@ paths:
                             - id
                             - title
                             - author
-                            - published_at
+                            - publishedAt
                 "404":
                     description: Not Found response.
                     schema:
-                        type: string
+                        $ref: '#/definitions/BooksGetBookNotFoundResponseBody'
                 "500":
                     description: Internal Server Error response.
                     schema:
-                        type: string
+                        $ref: '#/definitions/BooksGetBookInternalErrorResponseBody'
             schemes:
                 - http
         delete:
@@ -166,11 +166,11 @@ paths:
                 "404":
                     description: Not Found response.
                     schema:
-                        type: string
+                        $ref: '#/definitions/BooksDeleteBookNotFoundResponseBody'
                 "500":
                     description: Internal Server Error response.
                     schema:
-                        type: string
+                        $ref: '#/definitions/BooksDeleteBookInternalErrorResponseBody'
             schemes:
                 - http
         patch:
@@ -201,23 +201,23 @@ paths:
                             - id
                             - title
                             - author
-                            - published_at
+                            - publishedAt
                 "400":
                     description: Bad Request response.
                     schema:
-                        type: string
+                        $ref: '#/definitions/BooksUpdateBookInvalidInputResponseBody'
                 "404":
                     description: Not Found response.
                     schema:
-                        type: string
+                        $ref: '#/definitions/BooksUpdateBookNotFoundResponseBody'
                 "409":
                     description: Conflict response.
                     schema:
-                        type: string
+                        $ref: '#/definitions/BooksUpdateBookConflictResponseBody'
                 "500":
                     description: Internal Server Error response.
                     schema:
-                        type: string
+                        $ref: '#/definitions/BooksUpdateBookInternalErrorResponseBody'
             schemes:
                 - http
     /books/{id}/cover:
@@ -233,6 +233,11 @@ paths:
                   required: true
                   type: integer
                   format: int64
+                - name: Content-Type
+                  in: header
+                  description: Content-Type header
+                  required: true
+                  type: string
             responses:
                 "200":
                     description: OK response.
@@ -242,23 +247,72 @@ paths:
                             - id
                             - title
                             - author
-                            - published_at
+                            - publishedAt
                 "400":
                     description: Bad Request response.
                     schema:
-                        type: string
+                        $ref: '#/definitions/BooksSetBookCoverInvalidImageFormatResponseBody'
                 "404":
                     description: Not Found response.
                     schema:
-                        type: string
+                        $ref: '#/definitions/BooksSetBookCoverNotFoundResponseBody'
                 "413":
                     description: Request Entity Too Large response.
                     schema:
-                        type: string
+                        $ref: '#/definitions/BooksSetBookCoverPayloadTooLargeResponseBody'
                 "500":
                     description: Internal Server Error response.
                     schema:
-                        type: string
+                        $ref: '#/definitions/BooksSetBookCoverInternalErrorResponseBody'
+            schemes:
+                - http
+    /openapi.json:
+        get:
+            tags:
+                - books
+            summary: Download ./gen/http/openapi3.json
+            operationId: books#/openapi.json
+            responses:
+                "200":
+                    description: File downloaded
+                    schema:
+                        type: file
+            schemes:
+                - http
+    /swagger:
+        get:
+            tags:
+                - books
+            summary: Download ./public/swagger.html
+            operationId: books#/swagger
+            responses:
+                "200":
+                    description: File downloaded
+                    schema:
+                        type: file
+            schemes:
+                - http
+    /uploads/covers/{path}:
+        get:
+            tags:
+                - books
+            summary: Download ./uploads/covers
+            operationId: books#/uploads/covers/{*path}
+            parameters:
+                - name: path
+                  in: path
+                  description: Relative file path
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: File downloaded
+                    schema:
+                        type: file
+                "404":
+                    description: File not found
+                    schema:
+                        $ref: '#/definitions/Error'
             schemes:
                 - http
 definitions:
@@ -268,33 +322,162 @@ definitions:
         properties:
             author:
                 type: string
-                example: Quos officia est facere nihil qui.
+                example: Molestiae non sequi et ducimus.
             cover_url:
                 type: string
-                example: Dolore eum rerum eligendi reiciendis consequuntur.
+                example: Et voluptatem autem vel ut recusandae dolores.
             id:
                 type: integer
-                example: 1987243621613679910
+                example: 5664987013752852662
                 format: int64
-            published_at:
+            publishedAt:
                 type: string
-                example: "2008-10-20"
+                example: "2008-11-03"
                 format: date
             title:
                 type: string
-                example: Dolore animi qui dolor.
+                example: Eos et.
         description: A single book
         example:
-            author: Cumque cupiditate nobis deleniti.
-            cover_url: Doloremque quo voluptatem aspernatur omnis quia.
-            id: 3815735839398449291
-            published_at: "2006-09-19"
-            title: Placeat sunt.
+            author: Voluptate vel ut omnis facere molestiae esse.
+            cover_url: Quaerat illo tenetur quaerat pariatur adipisci optio.
+            id: 370191916227650255
+            publishedAt: "1997-08-08"
+            title: Ut et tempore dolores iste laboriosam libero.
         required:
             - id
             - title
             - author
-            - published_at
+            - publishedAt
+    BooksCreateBookConflictResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: false
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: true
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: true
+        description: createBook_conflict_response_body result type (default view)
+        example:
+            fault: true
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: false
+            timeout: true
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    BooksCreateBookInternalErrorResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: false
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: true
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: true
+        description: createBook_internal_error_response_body result type (default view)
+        example:
+            fault: false
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: false
+            timeout: false
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    BooksCreateBookInvalidInputResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: false
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: true
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: false
+        description: createBook_invalid_input_response_body result type (default view)
+        example:
+            fault: true
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: true
+            timeout: false
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
     BooksCreateBookRequestBody:
         title: BooksCreateBookRequestBody
         type: object
@@ -302,24 +485,626 @@ definitions:
             author:
                 type: string
                 description: Author of the book
-                example: Ut deleniti facere iste nostrum.
-            published_at:
+                example: Cumque cupiditate nobis deleniti.
+            publishedAt:
                 type: string
                 description: Publication time of the book
-                example: "1996-08-29"
+                example: "1978-11-22"
                 format: date
             title:
                 type: string
                 description: Title of the book
-                example: Quod quia.
+                example: Placeat sunt.
         example:
-            author: Est vel eum facere deserunt molestiae.
-            published_at: "2008-04-15"
-            title: Corrupti alias dolorum.
+            author: Quo id quod quia nulla.
+            publishedAt: "1988-09-18"
+            title: Nemo illo qui qui.
         required:
             - title
             - author
-            - published_at
+            - publishedAt
+    BooksDeleteBookInternalErrorResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: true
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: false
+        description: deleteBook_internal_error_response_body result type (default view)
+        example:
+            fault: false
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: false
+            timeout: true
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    BooksDeleteBookNotFoundResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: false
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: true
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: true
+        description: deleteBook_not_found_response_body result type (default view)
+        example:
+            fault: true
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: true
+            timeout: false
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    BooksGetBookInternalErrorResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: false
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: true
+        description: getBook_internal_error_response_body result type (default view)
+        example:
+            fault: false
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: true
+            timeout: true
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    BooksGetBookNotFoundResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: false
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: false
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: false
+        description: getBook_not_found_response_body result type (default view)
+        example:
+            fault: false
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: true
+            timeout: false
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    BooksGetBooksInternalErrorResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: false
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: false
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: false
+        description: getBooks_internal_error_response_body result type (default view)
+        example:
+            fault: false
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: true
+            timeout: false
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    BooksGetBooksNotFoundResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: false
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: false
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: false
+        description: getBooks_not_found_response_body result type (default view)
+        example:
+            fault: true
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: false
+            timeout: true
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    BooksSetBookCoverInternalErrorResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: false
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: true
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: false
+        description: setBookCover_internal_error_response_body result type (default view)
+        example:
+            fault: false
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: false
+            timeout: false
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    BooksSetBookCoverInvalidImageFormatResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: false
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: true
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: true
+        description: setBookCover_invalid_image_format_response_body result type (default view)
+        example:
+            fault: true
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: true
+            timeout: true
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    BooksSetBookCoverNotFoundResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: true
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: true
+        description: setBookCover_not_found_response_body result type (default view)
+        example:
+            fault: false
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: false
+            timeout: false
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    BooksSetBookCoverPayloadTooLargeResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: false
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: false
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: false
+        description: setBookCover_payload_too_large_response_body result type (default view)
+        example:
+            fault: false
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: true
+            timeout: false
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    BooksUpdateBookConflictResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: true
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: false
+        description: updateBook_conflict_response_body result type (default view)
+        example:
+            fault: false
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: true
+            timeout: false
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    BooksUpdateBookInternalErrorResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: false
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: true
+        description: updateBook_internal_error_response_body result type (default view)
+        example:
+            fault: false
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: false
+            timeout: true
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    BooksUpdateBookInvalidInputResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: false
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: true
+        description: updateBook_invalid_input_response_body result type (default view)
+        example:
+            fault: false
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: true
+            timeout: true
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    BooksUpdateBookNotFoundResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: true
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: false
+        description: updateBook_not_found_response_body result type (default view)
+        example:
+            fault: false
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: true
+            timeout: false
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
     BooksUpdateBookRequestBody:
         title: BooksUpdateBookRequestBody
         type: object
@@ -327,17 +1112,60 @@ definitions:
             author:
                 type: string
                 description: Author of the book
-                example: Aspernatur sunt optio quia.
-            published_at:
+                example: Inventore dolore et saepe at.
+            publishedAt:
                 type: string
                 description: Publication time of the book
-                example: "1988-02-10"
+                example: "1977-03-12"
                 format: date
             title:
                 type: string
                 description: Title of the book
-                example: Iste quibusdam quia et qui.
+                example: Maxime nihil.
         example:
-            author: Repellendus et id libero ad aut facere.
-            published_at: "1974-05-25"
-            title: Velit hic illum voluptas.
+            author: Voluptas ab autem debitis blanditiis ab in.
+            publishedAt: "1990-04-21"
+            title: Quibusdam nihil molestiae.
+    Error:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: false
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: true
+        description: Error response result type (default view)
+        example:
+            fault: true
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: false
+            timeout: false
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault

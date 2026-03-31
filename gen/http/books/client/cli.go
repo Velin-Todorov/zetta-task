@@ -49,7 +49,7 @@ func BuildGetBooksPayload(booksGetBooksTitle string, booksGetBooksAuthor string,
 	{
 		if booksGetBooksPublishedAt != "" {
 			publishedAt = &booksGetBooksPublishedAt
-			err = goa.MergeErrors(err, goa.ValidateFormat("published_at", *publishedAt, goa.FormatDate))
+			err = goa.MergeErrors(err, goa.ValidateFormat("publishedAt", *publishedAt, goa.FormatDate))
 			if err != nil {
 				return nil, err
 			}
@@ -132,9 +132,9 @@ func BuildCreateBookPayload(booksCreateBookBody string) (*books.CreateBookPayloa
 	{
 		err = json.Unmarshal([]byte(booksCreateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"Eum velit quibusdam alias adipisci.\",\n      \"published_at\": \"2005-07-03\",\n      \"title\": \"Consequatur ipsum aut corrupti minus.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"Eum esse.\",\n      \"publishedAt\": \"2011-11-11\",\n      \"title\": \"Quia rerum odit amet.\"\n   }'")
 		}
-		err = goa.MergeErrors(err, goa.ValidateFormat("body.published_at", body.PublishedAt, goa.FormatDate))
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.publishedAt", body.PublishedAt, goa.FormatDate))
 		if err != nil {
 			return nil, err
 		}
@@ -156,10 +156,10 @@ func BuildUpdateBookPayload(booksUpdateBookBody string, booksUpdateBookID string
 	{
 		err = json.Unmarshal([]byte(booksUpdateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"Aspernatur accusamus sint dignissimos quia consequatur ea.\",\n      \"published_at\": \"2010-04-24\",\n      \"title\": \"Ducimus doloribus.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"Eaque beatae natus amet dolor a et.\",\n      \"publishedAt\": \"1998-09-28\",\n      \"title\": \"Ut non ab repellat sed architecto laborum.\"\n   }'")
 		}
 		if body.PublishedAt != nil {
-			err = goa.MergeErrors(err, goa.ValidateFormat("body.published_at", *body.PublishedAt, goa.FormatDate))
+			err = goa.MergeErrors(err, goa.ValidateFormat("body.publishedAt", *body.PublishedAt, goa.FormatDate))
 		}
 		if err != nil {
 			return nil, err
@@ -184,7 +184,7 @@ func BuildUpdateBookPayload(booksUpdateBookBody string, booksUpdateBookID string
 
 // BuildSetBookCoverPayload builds the payload for the books setBookCover
 // endpoint from CLI flags.
-func BuildSetBookCoverPayload(booksSetBookCoverID string) (*books.SetBookCoverPayload, error) {
+func BuildSetBookCoverPayload(booksSetBookCoverID string, booksSetBookCoverContentType string) (*books.SetBookCoverPayload, error) {
 	var err error
 	var id int64
 	{
@@ -193,8 +193,13 @@ func BuildSetBookCoverPayload(booksSetBookCoverID string) (*books.SetBookCoverPa
 			return nil, fmt.Errorf("invalid value for id, must be INT64")
 		}
 	}
+	var contentType string
+	{
+		contentType = booksSetBookCoverContentType
+	}
 	v := &books.SetBookCoverPayload{}
 	v.ID = id
+	v.ContentType = contentType
 
 	return v, nil
 }

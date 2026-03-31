@@ -41,6 +41,9 @@ type Client struct {
 	// endpoint.
 	DeleteBookDoer goahttp.Doer
 
+	// CORS Doer is the HTTP client used to make requests to the  endpoint.
+	CORSDoer goahttp.Doer
+
 	// RestoreResponseBody controls whether the response bodies are reset after
 	// decoding so they can be read again.
 	RestoreResponseBody bool
@@ -67,6 +70,7 @@ func NewClient(
 		UpdateBookDoer:      doer,
 		SetBookCoverDoer:    doer,
 		DeleteBookDoer:      doer,
+		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
 		host:                host,
@@ -170,10 +174,15 @@ func (c *Client) UpdateBook() goa.Endpoint {
 // service setBookCover server.
 func (c *Client) SetBookCover() goa.Endpoint {
 	var (
+		encodeRequest  = EncodeSetBookCoverRequest(c.encoder)
 		decodeResponse = DecodeSetBookCoverResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v any) (any, error) {
 		req, err := c.BuildSetBookCoverRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
 		if err != nil {
 			return nil, err
 		}

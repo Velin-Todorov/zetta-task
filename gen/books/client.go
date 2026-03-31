@@ -38,12 +38,12 @@ func NewClient(getBooks, getBook, createBook, updateBook, setBookCover, deleteBo
 
 // GetBooks calls the "getBooks" endpoint of the "books" service.
 // GetBooks may return the following errors:
-//   - "not_found" (type NotFound)
-//   - "invalid_input" (type InvalidInput)
-//   - "invalid_image_format" (type InvalidImageFormat)
-//   - "payload_too_large" (type PayloadTooLarge)
-//   - "conflict" (type Conflict)
-//   - "internal_error" (type InternalError)
+//   - "not_found" (type *goa.ServiceError)
+//   - "invalid_input" (type *goa.ServiceError)
+//   - "invalid_image_format" (type *goa.ServiceError)
+//   - "payload_too_large" (type *goa.ServiceError)
+//   - "conflict" (type *goa.ServiceError)
+//   - "internal_error" (type *goa.ServiceError)
 //   - error: internal error
 func (c *Client) GetBooks(ctx context.Context, p *GetBooksPayload) (res []*Book, err error) {
 	var ires any
@@ -56,12 +56,12 @@ func (c *Client) GetBooks(ctx context.Context, p *GetBooksPayload) (res []*Book,
 
 // GetBook calls the "getBook" endpoint of the "books" service.
 // GetBook may return the following errors:
-//   - "not_found" (type NotFound)
-//   - "invalid_input" (type InvalidInput)
-//   - "invalid_image_format" (type InvalidImageFormat)
-//   - "payload_too_large" (type PayloadTooLarge)
-//   - "conflict" (type Conflict)
-//   - "internal_error" (type InternalError)
+//   - "not_found" (type *goa.ServiceError)
+//   - "invalid_input" (type *goa.ServiceError)
+//   - "invalid_image_format" (type *goa.ServiceError)
+//   - "payload_too_large" (type *goa.ServiceError)
+//   - "conflict" (type *goa.ServiceError)
+//   - "internal_error" (type *goa.ServiceError)
 //   - error: internal error
 func (c *Client) GetBook(ctx context.Context, p *GetBookPayload) (res *Book, err error) {
 	var ires any
@@ -74,12 +74,12 @@ func (c *Client) GetBook(ctx context.Context, p *GetBookPayload) (res *Book, err
 
 // CreateBook calls the "createBook" endpoint of the "books" service.
 // CreateBook may return the following errors:
-//   - "not_found" (type NotFound)
-//   - "invalid_input" (type InvalidInput)
-//   - "invalid_image_format" (type InvalidImageFormat)
-//   - "payload_too_large" (type PayloadTooLarge)
-//   - "conflict" (type Conflict)
-//   - "internal_error" (type InternalError)
+//   - "not_found" (type *goa.ServiceError)
+//   - "invalid_input" (type *goa.ServiceError)
+//   - "invalid_image_format" (type *goa.ServiceError)
+//   - "payload_too_large" (type *goa.ServiceError)
+//   - "conflict" (type *goa.ServiceError)
+//   - "internal_error" (type *goa.ServiceError)
 //   - error: internal error
 func (c *Client) CreateBook(ctx context.Context, p *CreateBookPayload) (res *Book, err error) {
 	var ires any
@@ -92,12 +92,12 @@ func (c *Client) CreateBook(ctx context.Context, p *CreateBookPayload) (res *Boo
 
 // UpdateBook calls the "updateBook" endpoint of the "books" service.
 // UpdateBook may return the following errors:
-//   - "not_found" (type NotFound)
-//   - "invalid_input" (type InvalidInput)
-//   - "invalid_image_format" (type InvalidImageFormat)
-//   - "payload_too_large" (type PayloadTooLarge)
-//   - "conflict" (type Conflict)
-//   - "internal_error" (type InternalError)
+//   - "not_found" (type *goa.ServiceError)
+//   - "invalid_input" (type *goa.ServiceError)
+//   - "invalid_image_format" (type *goa.ServiceError)
+//   - "payload_too_large" (type *goa.ServiceError)
+//   - "conflict" (type *goa.ServiceError)
+//   - "internal_error" (type *goa.ServiceError)
 //   - error: internal error
 func (c *Client) UpdateBook(ctx context.Context, p *UpdateBookPayload) (res *Book, err error) {
 	var ires any
@@ -110,12 +110,12 @@ func (c *Client) UpdateBook(ctx context.Context, p *UpdateBookPayload) (res *Boo
 
 // SetBookCover calls the "setBookCover" endpoint of the "books" service.
 // SetBookCover may return the following errors:
-//   - "not_found" (type NotFound)
-//   - "invalid_input" (type InvalidInput)
-//   - "invalid_image_format" (type InvalidImageFormat)
-//   - "payload_too_large" (type PayloadTooLarge)
-//   - "conflict" (type Conflict)
-//   - "internal_error" (type InternalError)
+//   - "not_found" (type *goa.ServiceError)
+//   - "invalid_input" (type *goa.ServiceError)
+//   - "invalid_image_format" (type *goa.ServiceError)
+//   - "payload_too_large" (type *goa.ServiceError)
+//   - "conflict" (type *goa.ServiceError)
+//   - "internal_error" (type *goa.ServiceError)
 //   - error: internal error
 func (c *Client) SetBookCover(ctx context.Context, p *SetBookCoverPayload, req io.ReadCloser) (res *Book, err error) {
 	var ires any
@@ -128,12 +128,12 @@ func (c *Client) SetBookCover(ctx context.Context, p *SetBookCoverPayload, req i
 
 // DeleteBook calls the "deleteBook" endpoint of the "books" service.
 // DeleteBook may return the following errors:
-//   - "not_found" (type NotFound)
-//   - "invalid_input" (type InvalidInput)
-//   - "invalid_image_format" (type InvalidImageFormat)
-//   - "payload_too_large" (type PayloadTooLarge)
-//   - "conflict" (type Conflict)
-//   - "internal_error" (type InternalError)
+//   - "not_found" (type *goa.ServiceError)
+//   - "invalid_input" (type *goa.ServiceError)
+//   - "invalid_image_format" (type *goa.ServiceError)
+//   - "payload_too_large" (type *goa.ServiceError)
+//   - "conflict" (type *goa.ServiceError)
+//   - "internal_error" (type *goa.ServiceError)
 //   - error: internal error
 func (c *Client) DeleteBook(ctx context.Context, p *DeleteBookPayload) (err error) {
 	_, err = c.DeleteBookEndpoint(ctx, p)
