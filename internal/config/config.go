@@ -8,13 +8,14 @@ import (
 )
 
 
+// Config holds the config for DB, server and storage
 type Config struct {
 	Database DatabaseConfig `yaml:"database"`
 	Server ServerConfig `yaml:"server"`
 	Storage StorageConfig `yaml:"storage"`
 }
 
-
+// Database config is the config for the DB
 type DatabaseConfig struct {
     Host     string `yaml:"host"`
     Port     int    `yaml:"port"`
@@ -23,14 +24,17 @@ type DatabaseConfig struct {
     Name     string `yaml:"name"`
 }
 
+// ServerConfig is the config for the server
 type ServerConfig struct {
     Port int `yaml:"port"`
 }
 
+// StorageConfig is the config for the storage
 type StorageConfig struct {
     UploadPath string `yaml:"upload_path"`
 }
 
+// Load loads the data from yaml config and creates the config
 func Load(path string) (*Config, error) {
     data, err := os.ReadFile(path)
     if err != nil {
@@ -50,6 +54,7 @@ func Load(path string) (*Config, error) {
     return &cfg, nil
 }
 
+// Create a connection string for MySQL
 func (c *DatabaseConfig) DSN() string {
     return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true",
         c.User, c.Password, c.Host, c.Port, c.Name)

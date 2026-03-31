@@ -12,11 +12,13 @@ import (
 )
 
 
+// mysqlBookRepository is the MySQL implementation of BookRepository.
 type mysqlBookRepository struct {
 	queries *db.Queries
 	db      *sql.DB
 }
 
+// GetBooks returns books matching the given filters with pagination.
 func (r *mysqlBookRepository) GetBooks(ctx context.Context, filter BookFilter) ([]db.Book, error) {
 	query := sq.Select("*").
 		From("books").
@@ -67,6 +69,7 @@ func (r *mysqlBookRepository) GetBooks(ctx context.Context, filter BookFilter) (
 	return books, rows.Err()
 }
 
+// GetBook returns a single book by ID.
 func (r *mysqlBookRepository) GetBook(ctx context.Context, id int64) (*db.Book, error) {
 	book, err := r.queries.GetBook(ctx, id)
 	if err != nil {
@@ -76,6 +79,7 @@ func (r *mysqlBookRepository) GetBook(ctx context.Context, id int64) (*db.Book, 
 	return &book, nil
 }
 
+// CreateBook inserts a new book and returns it. Returns ErrConflict if the title+author combination already exists.
 func (r *mysqlBookRepository) CreateBook(ctx context.Context, params db.CreateBookParams) (*db.Book, error) {
 	res, err := r.queries.CreateBook(ctx, params)
 	if err != nil {
@@ -95,6 +99,7 @@ func (r *mysqlBookRepository) CreateBook(ctx context.Context, params db.CreateBo
 	return &book, nil
 }
 
+// UpdateBook updates a book's fields and returns the updated book.
 func (r *mysqlBookRepository) UpdateBook(ctx context.Context, params db.UpdateBookParams) (*db.Book, error) {
 	_, err := r.queries.UpdateBook(ctx, params)
 	if err != nil {
@@ -109,6 +114,7 @@ func (r *mysqlBookRepository) UpdateBook(ctx context.Context, params db.UpdateBo
 	return &book, nil
 }
 
+// DeleteBook removes a book by ID.
 func (r *mysqlBookRepository) DeleteBook(ctx context.Context, id int64) error {
 	err := r.queries.DeleteBook(ctx, id)
 	if err != nil {
@@ -118,6 +124,7 @@ func (r *mysqlBookRepository) DeleteBook(ctx context.Context, id int64) error {
 	return nil
 }
 
+// SetBookCover updates the cover path for a book and returns the updated book.
 func (r *mysqlBookRepository) SetBookCover(ctx context.Context, params db.UpdateBookCoverParams) (*db.Book, error) {
 	_, err := r.queries.UpdateBookCover(ctx, params)
 	if err != nil {
@@ -132,6 +139,7 @@ func (r *mysqlBookRepository) SetBookCover(ctx context.Context, params db.Update
 	return &book, nil
 }
 
+// NewMySQLBookRepository creates a new BookRepository backed by MySQL.
 func NewMySQLBookRepository(database *sql.DB) BookRepository {
 	return &mysqlBookRepository{
 		queries: db.New(database),
@@ -139,6 +147,8 @@ func NewMySQLBookRepository(database *sql.DB) BookRepository {
 	}
 }
 
+// wrapMySQLError translates MySQL-specific errors into domain errors.
+// Maps error 1062 (duplicate entry) to ErrConflict.
 func wrapMySQLError(err error) error {
     var mysqlErr *mysql.MySQLError
     if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {

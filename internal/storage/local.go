@@ -9,12 +9,18 @@ import (
 	"path/filepath"
 )
 
+// localStorage is the filesystem implementation of ImageStore.
 type localStorage struct {
 	basePath string
 }
 
+// Save validates and stores an image on disk. It enforces max file size,
+// validates the content type by reading the file header, and removes any
+// existing cover for the given book ID before writing the new file.
 func (s *localStorage) Save(ctx context.Context, id int64, r io.Reader) (string, error) {
-	lr := io.LimitReader(r, maxFileSize+1) // what is this?
+	// We make use of LimitReader to prevent reading files that are too big into memory. With 
+	// LimitReader we read up until max allowable file size +1 byte. The idea with the +1 is to check if there is more data than allowed.
+	lr := io.LimitReader(r, maxFileSize+1)
 
 	buf, err := io.ReadAll(lr)
 	if err != nil {
@@ -51,6 +57,7 @@ func (s *localStorage) Save(ctx context.Context, id int64, r io.Reader) (string,
 	return path, nil
 }
 
+// NewLocalStorage creates a new ImageStore that saves files to the given directory.
 func NewLocalStorage(basePath string) ImageStore {
 	return &localStorage{basePath: basePath}
 }

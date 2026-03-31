@@ -11,7 +11,7 @@ var _ = API("bookstore", func() {
 	Version("1.0.0")
 	Server("bookstore", func() {
 		Host("localhost", func() {
-			URI("http://0.0.0.0:8080")
+			URI("http://localhost:8080")
 		})
 	})
 })
@@ -25,7 +25,11 @@ var _ = Service("books", func() {
 	Error("conflict")
 	Error("internal_error")
 
-	cors.Origin("*")
+	// CORS is required for Swagger UI to make API calls from the browser.
+	cors.Origin("*", func() {
+		cors.Methods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+		cors.Headers("Content-Type")
+	})
 
 	Method("getBooks", func() {
 		Result(ArrayOf(Book))
@@ -131,14 +135,13 @@ var _ = Service("books", func() {
 	Method("setBookCover", func() {
 		Payload(func() {
 			Attribute("id", Int64, "ID of the book")
-			Attribute("contentType", String, "Content-Type header")
-			Required("id", "contentType")
+			Attribute("cover", Bytes, "Book cover image")
+			Required("id", "cover")
 		})
 		Result(Book)
 		HTTP(func() {
 			PUT("/books/{id}/cover")
-			Header("contentType:Content-Type")
-			SkipRequestBodyEncodeDecode()
+			MultipartRequest()
 			Response(StatusOK)
 			Response("not_found", StatusNotFound)
 			Response("invalid_image_format", StatusBadRequest)

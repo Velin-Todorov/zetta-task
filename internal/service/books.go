@@ -1,12 +1,9 @@
 package bookstore
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
-	"fmt"
-	"io"
-	"mime"
-	"mime/multipart"
 	"time"
 
 	books "github.com/Velin-Todorov/zetta-task/gen/books"
@@ -15,6 +12,7 @@ import (
 	"github.com/Velin-Todorov/zetta-task/internal/storage"
 )
 
+// bookssrvc implements the books service interface.
 type bookssrvc struct {
 	repo    repository.BookRepository
 	storage storage.ImageStore
@@ -25,7 +23,8 @@ func NewBooks(repo repository.BookRepository, storage storage.ImageStore) books.
 	return &bookssrvc{repo: repo, storage: storage}
 }
 
-// GetBooks implements getBooks.
+// GetBooks returns a list of books matching the given filters with pagination.
+// Defaults to limit=20, offset=0 if not provided.
 func (s *bookssrvc) GetBooks(ctx context.Context, p *books.GetBooksPayload) ([]*books.Book, error) {
 	var result []*books.Book
 	limit := uint64(20)
@@ -62,7 +61,7 @@ func (s *bookssrvc) GetBooks(ctx context.Context, p *books.GetBooksPayload) ([]*
 	return result, nil
 }
 
-// GetBook implements getBook.
+// GetBook returns a single book by ID.
 func (s *bookssrvc) GetBook(ctx context.Context, p *books.GetBookPayload) (*books.Book, error) {
 	dbBook, err := s.repo.GetBook(ctx, p.ID)
 	if err == sql.ErrNoRows {
@@ -75,7 +74,7 @@ func (s *bookssrvc) GetBook(ctx context.Context, p *books.GetBookPayload) (*book
 	return toBook(dbBook), nil
 }
 
-// CreateBook implements createBook.
+// CreateBook creates a new book. Returns conflict if the title+author combination already exists.
 func (s *bookssrvc) CreateBook(ctx context.Context, p *books.CreateBookPayload) (*books.Book, error) {
 	publishedAt, err := time.Parse(time.DateOnly, p.PublishedAt)
 	if err != nil {
@@ -97,10 +96,8 @@ func (s *bookssrvc) CreateBook(ctx context.Context, p *books.CreateBookPayload) 
 	return toBook(book), nil
 }
 
-// SetBookCover implements setBookCover.
-func (s *bookssrvc) SetBookCover(ctx context.Context, p *books.SetBookCoverPayload, req io.ReadCloser) (*books.Book, error) {
-	defer req.Close()
-
+// SetBookCover uploads a cover image for a book. Validates the book exists before saving the file.
+func (s *bookssrvc) SetBookCover(ctx context.Context, p *books.SetBookCoverPayload) (*books.Book, error) {
 	_, err := s.repo.GetBook(ctx, p.ID)
 	if err == sql.ErrNoRows {
 		return nil, books.MakeNotFound(err)
@@ -109,13 +106,7 @@ func (s *bookssrvc) SetBookCover(ctx context.Context, p *books.SetBookCoverPaylo
 		return nil, books.MakeInternalError(err)
 	}
 
-	file, err := extractFile(req, p.ContentType)
-	if err != nil {
-		return nil, books.MakeInvalidInput(err)
-	}
-	defer file.Close()
-
-	path, err := s.storage.Save(ctx, p.ID, file)
+	path, err := s.storage.Save(ctx, p.ID, bytes.NewReader(p.Cover))
 	if err != nil {
 		if storage.IsInvalidFormat(err) {
 			return nil, books.MakeInvalidImageFormat(err)
@@ -140,7 +131,7 @@ func (s *bookssrvc) SetBookCover(ctx context.Context, p *books.SetBookCoverPaylo
 	return toBook(book), nil
 }
 
-// UpdateBook implements updateBook.
+// UpdateBook partially updates a book. Fetches the existing book first and merges only the provided fields.
 func (s *bookssrvc) UpdateBook(ctx context.Context, p *books.UpdateBookPayload) (*books.Book, error) {
 	existing, err := s.repo.GetBook(ctx, p.ID)
 	if err == sql.ErrNoRows {
@@ -180,7 +171,7 @@ func (s *bookssrvc) UpdateBook(ctx context.Context, p *books.UpdateBookPayload) 
 	return toBook(book), nil
 }
 
-// DeleteBook implements deleteBook.
+// DeleteBook removes a book by ID. Returns not found if the book doesn't exist.
 func (s *bookssrvc) DeleteBook(ctx context.Context, p *books.DeleteBookPayload) error {
 	_, err := s.repo.GetBook(ctx, p.ID)
 	if err == sql.ErrNoRows {
@@ -196,23 +187,7 @@ func (s *bookssrvc) DeleteBook(ctx context.Context, p *books.DeleteBookPayload) 
 	return nil
 }
 
-func extractFile(body io.Reader, contentType string) (io.ReadCloser, error) {
-	_, params, err := mime.ParseMediaType(contentType)
-	if err != nil {
-		return nil, err
-	}
-	boundary, ok := params["boundary"]
-	if !ok {
-		return nil, fmt.Errorf("no boundary in content type")
-	}
-	reader := multipart.NewReader(body, boundary)
-	part, err := reader.NextPart()
-	if err != nil {
-		return nil, err
-	}
-	return part, nil
-}
-
+// toBook converts a db.Book to the API response type.
 func toBook(dbBook *db.Book) *books.Book {
 	var coverURL *string
 	if dbBook.CoverPath.Valid {

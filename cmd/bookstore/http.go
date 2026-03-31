@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"io"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"sync"
@@ -50,7 +52,7 @@ func handleHTTPServer(ctx context.Context, u *url.URL, booksEndpoints *books.End
 	)
 	{	
 		eh := errorHandler(ctx)
-		booksServer = bookssvr.New(booksEndpoints, mux, dec, enc, eh, nil, nil, nil, nil)
+		booksServer = bookssvr.New(booksEndpoints, mux, dec, enc, eh, nil, setBookCoverDecoderFunc, nil, nil, nil)
 	}
 
 	// Configure the mux.
@@ -101,4 +103,23 @@ func errorHandler(logCtx context.Context) func(context.Context, http.ResponseWri
 	return func(ctx context.Context, w http.ResponseWriter, err error) {
 		log.Printf(logCtx, "ERROR: %s", err.Error())
 	}
+}
+
+
+// setBookCoverDecoderFunc decodes the multipart request for the setBookCover endpoint.
+// Goa calls this before populating the path params, so we need the nil check to
+// initialize the payload. Goa sets the ID from the path after this returns.
+func setBookCoverDecoderFunc(reader *multipart.Reader, payload **books.SetBookCoverPayload) error {
+	if *payload == nil {
+		*payload = &books.SetBookCoverPayload{}
+	}
+
+	part, err := reader.NextPart()
+	if err != nil {
+		return err
+	}
+	defer part.Close()
+
+	(*payload).Cover, err = io.ReadAll(part)
+	return err
 }
