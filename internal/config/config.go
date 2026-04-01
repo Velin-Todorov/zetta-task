@@ -15,7 +15,7 @@ type Config struct {
 	Storage StorageConfig `yaml:"storage"`
 }
 
-// Database config is the config for the DB
+// DatabaseConfig is the config for the DB
 type DatabaseConfig struct {
     Host     string `yaml:"host"`
     Port     int    `yaml:"port"`

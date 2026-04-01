@@ -73,25 +73,16 @@ Query parameters (all optional):
 - `title` - filter by title
 - `author` - filter by author
 - `publishedAt` - filter by exact date (YYYY-MM-DD)
-- `published_after` - filter by date range start (YYYY-MM-DD)
-- `published_before` - filter by date range end (YYYY-MM-DD)
+- `publishedAfter` - filter by date range start (YYYY-MM-DD)
+- `publishedBefore` - filter by date range end (YYYY-MM-DD)
 - `limit` - pagination limit (default: 20)
 - `offset` - pagination offset (default: 0)
 
-Example:
-```bash
-curl "http://localhost:8080/books?author=Frank+Herbert&limit=10"
-```
 
 ### Get Book
 
 ```
 GET /books/{id}
-```
-
-Example:
-```bash
-curl http://localhost:8080/books/1
 ```
 
 ### Create Book
@@ -110,13 +101,6 @@ Body:
 }
 ```
 
-Example:
-```bash
-curl -X POST http://localhost:8080/books \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Dune","author":"Frank Herbert","publishedAt":"1965-08-01"}'
-```
-
 ### Update Book (Partial)
 
 ```
@@ -129,13 +113,6 @@ Only include the fields you want to update:
 {
   "title": "Dune Messiah"
 }
-```
-
-Example:
-```bash
-curl -X PATCH http://localhost:8080/books/1 \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Dune Messiah"}'
 ```
 
 ### Upload Book Cover
@@ -154,21 +131,10 @@ The cover URL is returned in the book response as `cover_url` and can be accesse
 GET /uploads/covers/{filename}
 ```
 
-Example:
-```bash
-curl -X PUT http://localhost:8080/books/1/cover \
-  -F "cover=@/path/to/image.jpg"
-```
-
 ### Delete Book
 
 ```
 DELETE /books/{id}
-```
-
-Example:
-```bash
-curl -X DELETE http://localhost:8080/books/1
 ```
 
 ## Response Codes
