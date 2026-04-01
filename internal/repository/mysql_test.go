@@ -20,6 +20,7 @@ import (
 
 var testDB *sql.DB
 
+// TestMain is used here to set up a test container
 func TestMain(m *testing.M) {
 	ctx := context.Background()
 
@@ -50,7 +51,7 @@ func TestMain(m *testing.M) {
 	}
 
 	// Wait for MySQL to be ready
-	for i := 0; i < 30; i++ {
+	for range 30 {
 		if err := testDB.PingContext(ctx); err == nil {
 			break
 		}
@@ -87,7 +88,7 @@ func TestMain(m *testing.M) {
 
 func cleanup(t *testing.T) {
 	t.Helper()
-	_, err := testDB.ExecContext(context.Background(), "DELETE FROM books")
+	_, err := testDB.ExecContext(t.Context(), "DELETE FROM books")
 	require.NoError(t, err)
 }
 
@@ -98,7 +99,7 @@ func newRepo() repository.BookRepository {
 func seedBook(t *testing.T, title, author string, publishedAt time.Time) *db.Book {
 	t.Helper()
 	repo := newRepo()
-	book, err := repo.CreateBook(context.Background(), db.CreateBookParams{
+	book, err := repo.CreateBook(t.Context(), db.CreateBookParams{
 		Title:       title,
 		Author:      author,
 		PublishedAt: publishedAt,
@@ -107,13 +108,11 @@ func seedBook(t *testing.T, title, author string, publishedAt time.Time) *db.Boo
 	return book
 }
 
-// --- CreateBook ---
-
 func TestCreateBook_Success(t *testing.T) {
 	cleanup(t)
 	repo := newRepo()
 
-	book, err := repo.CreateBook(context.Background(), db.CreateBookParams{
+	book, err := repo.CreateBook(t.Context(), db.CreateBookParams{
 		Title:       "Dune",
 		Author:      "Frank Herbert",
 		PublishedAt: time.Date(1965, 8, 1, 0, 0, 0, 0, time.UTC),
@@ -130,14 +129,14 @@ func TestCreateBook_Conflict(t *testing.T) {
 	repo := newRepo()
 	date := time.Date(1965, 8, 1, 0, 0, 0, 0, time.UTC)
 
-	_, err := repo.CreateBook(context.Background(), db.CreateBookParams{
+	_, err := repo.CreateBook(t.Context(), db.CreateBookParams{
 		Title:       "Dune",
 		Author:      "Frank Herbert",
 		PublishedAt: date,
 	})
 	require.NoError(t, err)
 
-	_, err = repo.CreateBook(context.Background(), db.CreateBookParams{
+	_, err = repo.CreateBook(t.Context(), db.CreateBookParams{
 		Title:       "Dune",
 		Author:      "Frank Herbert",
 		PublishedAt: date,
@@ -154,7 +153,7 @@ func TestGetBook_Success(t *testing.T) {
 	seeded := seedBook(t, "Dune", "Frank Herbert", time.Date(1965, 8, 1, 0, 0, 0, 0, time.UTC))
 	repo := newRepo()
 
-	book, err := repo.GetBook(context.Background(), seeded.ID)
+	book, err := repo.GetBook(t.Context(), seeded.ID)
 
 	assert.NoError(t, err)
 	assert.Equal(t, seeded.ID, book.ID)
@@ -165,13 +164,11 @@ func TestGetBook_NotFound(t *testing.T) {
 	cleanup(t)
 	repo := newRepo()
 
-	_, err := repo.GetBook(context.Background(), 99999)
+	_, err := repo.GetBook(t.Context(), 99999)
 
 	assert.Error(t, err)
 	assert.ErrorIs(t, err, sql.ErrNoRows)
 }
-
-// --- GetBooks ---
 
 func TestGetBooks_NoFilters(t *testing.T) {
 	cleanup(t)
@@ -179,7 +176,7 @@ func TestGetBooks_NoFilters(t *testing.T) {
 	seedBook(t, "1984", "George Orwell", time.Date(1949, 6, 8, 0, 0, 0, 0, time.UTC))
 	repo := newRepo()
 
-	result, err := repo.GetBooks(context.Background(), repository.BookFilter{
+	result, err := repo.GetBooks(t.Context(), repository.BookFilter{
 		Limit:  100,
 		Offset: 0,
 	})
@@ -195,7 +192,7 @@ func TestGetBooks_FilterByAuthor(t *testing.T) {
 	repo := newRepo()
 
 	author := "Frank Herbert"
-	result, err := repo.GetBooks(context.Background(), repository.BookFilter{
+	result, err := repo.GetBooks(t.Context(), repository.BookFilter{
 		Author: &author,
 		Limit:  100,
 		Offset: 0,
@@ -213,7 +210,7 @@ func TestGetBooks_FilterByTitle(t *testing.T) {
 	repo := newRepo()
 
 	title := "1984"
-	result, err := repo.GetBooks(context.Background(), repository.BookFilter{
+	result, err := repo.GetBooks(t.Context(), repository.BookFilter{
 		Title:  &title,
 		Limit:  100,
 		Offset: 0,
@@ -232,7 +229,7 @@ func TestGetBooks_FilterByDateRange(t *testing.T) {
 
 	after := "1960-01-01"
 	before := "1970-01-01"
-	result, err := repo.GetBooks(context.Background(), repository.BookFilter{
+	result, err := repo.GetBooks(t.Context(), repository.BookFilter{
 		PublishedAfter:  &after,
 		PublishedBefore: &before,
 		Limit:           100,
@@ -251,7 +248,7 @@ func TestGetBooks_Pagination(t *testing.T) {
 	seedBook(t, "Book C", "Author C", time.Date(2002, 1, 1, 0, 0, 0, 0, time.UTC))
 	repo := newRepo()
 
-	result, err := repo.GetBooks(context.Background(), repository.BookFilter{
+	result, err := repo.GetBooks(t.Context(), repository.BookFilter{
 		Limit:  2,
 		Offset: 0,
 	})
@@ -259,7 +256,7 @@ func TestGetBooks_Pagination(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, result, 2)
 
-	result, err = repo.GetBooks(context.Background(), repository.BookFilter{
+	result, err = repo.GetBooks(t.Context(), repository.BookFilter{
 		Limit:  2,
 		Offset: 2,
 	})
@@ -268,14 +265,12 @@ func TestGetBooks_Pagination(t *testing.T) {
 	assert.Len(t, result, 1)
 }
 
-// --- UpdateBook ---
-
 func TestUpdateBook_Success(t *testing.T) {
 	cleanup(t)
 	seeded := seedBook(t, "Dune", "Frank Herbert", time.Date(1965, 8, 1, 0, 0, 0, 0, time.UTC))
 	repo := newRepo()
 
-	book, err := repo.UpdateBook(context.Background(), db.UpdateBookParams{
+	book, err := repo.UpdateBook(t.Context(), db.UpdateBookParams{
 		ID:          seeded.ID,
 		Title:       "Dune Messiah",
 		Author:      "Frank Herbert",
@@ -293,7 +288,7 @@ func TestUpdateBook_Conflict(t *testing.T) {
 	other := seedBook(t, "Dune Messiah", "Frank Herbert", time.Date(1969, 10, 1, 0, 0, 0, 0, time.UTC))
 	repo := newRepo()
 
-	_, err := repo.UpdateBook(context.Background(), db.UpdateBookParams{
+	_, err := repo.UpdateBook(t.Context(), db.UpdateBookParams{
 		ID:          other.ID,
 		Title:       "Dune",
 		Author:      "Frank Herbert",
@@ -304,14 +299,12 @@ func TestUpdateBook_Conflict(t *testing.T) {
 	assert.True(t, repository.IsConflict(err))
 }
 
-// --- SetBookCover ---
-
 func TestSetBookCover_Success(t *testing.T) {
 	cleanup(t)
 	seeded := seedBook(t, "Dune", "Frank Herbert", time.Date(1965, 8, 1, 0, 0, 0, 0, time.UTC))
 	repo := newRepo()
 
-	book, err := repo.SetBookCover(context.Background(), db.UpdateBookCoverParams{
+	book, err := repo.SetBookCover(t.Context(), db.UpdateBookCoverParams{
 		ID:        seeded.ID,
 		CoverPath: sql.NullString{String: "uploads/covers/1.jpg", Valid: true},
 	})
@@ -321,16 +314,14 @@ func TestSetBookCover_Success(t *testing.T) {
 	assert.Equal(t, "uploads/covers/1.jpg", book.CoverPath.String)
 }
 
-// --- DeleteBook ---
-
 func TestDeleteBook_Success(t *testing.T) {
 	cleanup(t)
 	seeded := seedBook(t, "Dune", "Frank Herbert", time.Date(1965, 8, 1, 0, 0, 0, 0, time.UTC))
 	repo := newRepo()
 
-	err := repo.DeleteBook(context.Background(), seeded.ID)
+	err := repo.DeleteBook(t.Context(), seeded.ID)
 	assert.NoError(t, err)
 
-	_, err = repo.GetBook(context.Background(), seeded.ID)
+	_, err = repo.GetBook(t.Context(), seeded.ID)
 	assert.ErrorIs(t, err, sql.ErrNoRows)
 }

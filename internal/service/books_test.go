@@ -479,6 +479,7 @@ func TestDeleteBook_Success(t *testing.T) {
 
 	repo.EXPECT().GetBook(mock.Anything, int64(1)).Return(DBMock(), nil)
 	repo.EXPECT().DeleteBook(mock.Anything, int64(1)).Return(nil)
+	store.EXPECT().Delete(mock.Anything, int64(1)).Return(nil)
 
 	svc := bookstore.NewBooks(repo, store)
 	err := svc.DeleteBook(t.Context(), &books.DeleteBookPayload{ID: 1})

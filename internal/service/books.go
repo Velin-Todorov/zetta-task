@@ -184,6 +184,10 @@ func (s *bookssrvc) DeleteBook(ctx context.Context, p *books.DeleteBookPayload) 
 	if err := s.repo.DeleteBook(ctx, p.ID); err != nil {
 		return books.MakeInternalError(err)
 	}
+
+	// Clean up the cover file if it exists
+	_ = s.storage.Delete(ctx, p.ID)
+
 	return nil
 }
 

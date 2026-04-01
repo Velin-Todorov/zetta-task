@@ -14,9 +14,7 @@ type localStorage struct {
 	basePath string
 }
 
-// Save validates and stores an image on disk. It enforces max file size,
-// validates the content type by reading the file header, and removes any
-// existing cover for the given book ID before writing the new file.
+// Save validates and stores an image on disk.
 func (s *localStorage) Save(ctx context.Context, id int64, r io.Reader) (string, error) {
 	// We make use of LimitReader to prevent reading files that are too big into memory. With 
 	// LimitReader we read up until max allowable file size +1 byte. The idea with the +1 is to check if there is more data than allowed.
@@ -55,6 +53,17 @@ func (s *localStorage) Save(ctx context.Context, id int64, r io.Reader) (string,
 	}
 
 	return path, nil
+}
+
+// Delete removes all cover images for the given book ID.
+func (s *localStorage) Delete(_ context.Context, id int64) error {
+	matches, _ := filepath.Glob(filepath.Join(s.basePath, fmt.Sprintf("%d.*", id)))
+	for _, m := range matches {
+		if err := os.Remove(m); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // NewLocalStorage creates a new ImageStore that saves files to the given directory.

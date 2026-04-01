@@ -35,4 +35,6 @@ func IsTooLarge(err error) bool {
 // ImageStore defines the interface for storing and retrieving book cover images.
 type ImageStore interface {
 	Save(ctx context.Context, id int64, r io.Reader) (string, error)
+	// Delete removes the cover image for the given book ID.
+	Delete(ctx context.Context, id int64) error
 }
