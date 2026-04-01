@@ -11,7 +11,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
-	"unicode/utf8"
 
 	books "github.com/Velin-Todorov/zetta-task/gen/books"
 	goa "goa.design/goa/v3/pkg"
@@ -25,24 +24,12 @@ func BuildGetBooksPayload(booksGetBooksTitle string, booksGetBooksAuthor string,
 	{
 		if booksGetBooksTitle != "" {
 			title = &booksGetBooksTitle
-			if utf8.RuneCountInString(*title) < 1 {
-				err = goa.MergeErrors(err, goa.InvalidLengthError("title", *title, utf8.RuneCountInString(*title), 1, true))
-			}
-			if err != nil {
-				return nil, err
-			}
 		}
 	}
 	var author *string
 	{
 		if booksGetBooksAuthor != "" {
 			author = &booksGetBooksAuthor
-			if utf8.RuneCountInString(*author) < 1 {
-				err = goa.MergeErrors(err, goa.InvalidLengthError("author", *author, utf8.RuneCountInString(*author), 1, true))
-			}
-			if err != nil {
-				return nil, err
-			}
 		}
 	}
 	var publishedAt *string
@@ -59,7 +46,7 @@ func BuildGetBooksPayload(booksGetBooksTitle string, booksGetBooksAuthor string,
 	{
 		if booksGetBooksPublishedAfter != "" {
 			publishedAfter = &booksGetBooksPublishedAfter
-			err = goa.MergeErrors(err, goa.ValidateFormat("published_after", *publishedAfter, goa.FormatDate))
+			err = goa.MergeErrors(err, goa.ValidateFormat("publishedAfter", *publishedAfter, goa.FormatDate))
 			if err != nil {
 				return nil, err
 			}
@@ -69,7 +56,7 @@ func BuildGetBooksPayload(booksGetBooksTitle string, booksGetBooksAuthor string,
 	{
 		if booksGetBooksPublishedBefore != "" {
 			publishedBefore = &booksGetBooksPublishedBefore
-			err = goa.MergeErrors(err, goa.ValidateFormat("published_before", *publishedBefore, goa.FormatDate))
+			err = goa.MergeErrors(err, goa.ValidateFormat("publishedBefore", *publishedBefore, goa.FormatDate))
 			if err != nil {
 				return nil, err
 			}
@@ -82,6 +69,12 @@ func BuildGetBooksPayload(booksGetBooksTitle string, booksGetBooksAuthor string,
 			limit = &val
 			if err != nil {
 				return nil, fmt.Errorf("invalid value for limit, must be UINT64")
+			}
+			if *limit < 1 {
+				err = goa.MergeErrors(err, goa.InvalidRangeError("limit", *limit, 1, true))
+			}
+			if err != nil {
+				return nil, err
 			}
 		}
 	}
@@ -132,7 +125,7 @@ func BuildCreateBookPayload(booksCreateBookBody string) (*books.CreateBookPayloa
 	{
 		err = json.Unmarshal([]byte(booksCreateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"Eum esse.\",\n      \"publishedAt\": \"2011-11-11\",\n      \"title\": \"Quia rerum odit amet.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"Officiis nemo quia aut veniam.\",\n      \"publishedAt\": \"1995-06-10\",\n      \"title\": \"Iure neque voluptatum quidem et esse.\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.publishedAt", body.PublishedAt, goa.FormatDate))
 		if err != nil {
@@ -156,7 +149,7 @@ func BuildUpdateBookPayload(booksUpdateBookBody string, booksUpdateBookID string
 	{
 		err = json.Unmarshal([]byte(booksUpdateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"Eaque beatae natus amet dolor a et.\",\n      \"publishedAt\": \"1998-09-28\",\n      \"title\": \"Ut non ab repellat sed architecto laborum.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"Beatae natus amet dolor a.\",\n      \"publishedAt\": \"1973-11-11\",\n      \"title\": \"Laborum magnam.\"\n   }'")
 		}
 		if body.PublishedAt != nil {
 			err = goa.MergeErrors(err, goa.ValidateFormat("body.publishedAt", *body.PublishedAt, goa.FormatDate))
@@ -190,7 +183,7 @@ func BuildSetBookCoverPayload(booksSetBookCoverBody string, booksSetBookCoverID 
 	{
 		err = json.Unmarshal([]byte(booksSetBookCoverBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"cover\": \"RXN0IHNpbWlsaXF1ZSBhdXQgYXV0Lg==\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"cover\": \"UmVydW0gc2VxdWkgcXVpLg==\"\n   }'")
 		}
 		if body.Cover == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("cover", "body"))

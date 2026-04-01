@@ -13,7 +13,6 @@ import (
 	"io"
 	"net/http"
 	"strconv"
-	"unicode/utf8"
 
 	books "github.com/Velin-Todorov/zetta-task/gen/books"
 	goahttp "goa.design/goa/v3/http"
@@ -53,19 +52,9 @@ func DecodeGetBooksRequest(mux goahttp.Muxer, decoder func(*http.Request) goahtt
 		if titleRaw != "" {
 			title = &titleRaw
 		}
-		if title != nil {
-			if utf8.RuneCountInString(*title) < 1 {
-				err = goa.MergeErrors(err, goa.InvalidLengthError("title", *title, utf8.RuneCountInString(*title), 1, true))
-			}
-		}
 		authorRaw := qp.Get("author")
 		if authorRaw != "" {
 			author = &authorRaw
-		}
-		if author != nil {
-			if utf8.RuneCountInString(*author) < 1 {
-				err = goa.MergeErrors(err, goa.InvalidLengthError("author", *author, utf8.RuneCountInString(*author), 1, true))
-			}
 		}
 		publishedAtRaw := qp.Get("publishedAt")
 		if publishedAtRaw != "" {
@@ -74,19 +63,19 @@ func DecodeGetBooksRequest(mux goahttp.Muxer, decoder func(*http.Request) goahtt
 		if publishedAt != nil {
 			err = goa.MergeErrors(err, goa.ValidateFormat("publishedAt", *publishedAt, goa.FormatDate))
 		}
-		publishedAfterRaw := qp.Get("published_after")
+		publishedAfterRaw := qp.Get("publishedAfter")
 		if publishedAfterRaw != "" {
 			publishedAfter = &publishedAfterRaw
 		}
 		if publishedAfter != nil {
-			err = goa.MergeErrors(err, goa.ValidateFormat("published_after", *publishedAfter, goa.FormatDate))
+			err = goa.MergeErrors(err, goa.ValidateFormat("publishedAfter", *publishedAfter, goa.FormatDate))
 		}
-		publishedBeforeRaw := qp.Get("published_before")
+		publishedBeforeRaw := qp.Get("publishedBefore")
 		if publishedBeforeRaw != "" {
 			publishedBefore = &publishedBeforeRaw
 		}
 		if publishedBefore != nil {
-			err = goa.MergeErrors(err, goa.ValidateFormat("published_before", *publishedBefore, goa.FormatDate))
+			err = goa.MergeErrors(err, goa.ValidateFormat("publishedBefore", *publishedBefore, goa.FormatDate))
 		}
 		{
 			limitRaw := qp.Get("limit")
@@ -96,6 +85,11 @@ func DecodeGetBooksRequest(mux goahttp.Muxer, decoder func(*http.Request) goahtt
 					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("limit", limitRaw, "unsigned integer"))
 				}
 				limit = &v
+			}
+		}
+		if limit != nil {
+			if *limit < 1 {
+				err = goa.MergeErrors(err, goa.InvalidRangeError("limit", *limit, 1, true))
 			}
 		}
 		{

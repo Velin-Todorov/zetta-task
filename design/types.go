@@ -10,7 +10,7 @@ var Book = Type("Book", func() {
 	Attribute("id", Int64)
 	Attribute("title", String)
 	Attribute("author", String)
-	Attribute("cover_url", String)
+	Attribute("coverUrl", String)
 	Attribute("publishedAt", String, func() {
 		Format(FormatDate)
 	})

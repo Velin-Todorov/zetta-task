@@ -55,10 +55,10 @@ func EncodeGetBooksRequest(encoder func(*http.Request) goahttp.Encoder) func(*ht
 			values.Add("publishedAt", *p.PublishedAt)
 		}
 		if p.PublishedAfter != nil {
-			values.Add("published_after", *p.PublishedAfter)
+			values.Add("publishedAfter", *p.PublishedAfter)
 		}
 		if p.PublishedBefore != nil {
-			values.Add("published_before", *p.PublishedBefore)
+			values.Add("publishedBefore", *p.PublishedBefore)
 		}
 		if p.Limit != nil {
 			values.Add("limit", fmt.Sprintf("%v", *p.Limit))

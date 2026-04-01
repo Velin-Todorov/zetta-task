@@ -47,7 +47,7 @@ type GetBookResponseBody struct {
 	ID          *int64  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Title       *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	Author      *string `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
-	CoverURL    *string `form:"cover_url,omitempty" json:"cover_url,omitempty" xml:"cover_url,omitempty"`
+	CoverURL    *string `form:"coverUrl,omitempty" json:"coverUrl,omitempty" xml:"coverUrl,omitempty"`
 	PublishedAt *string `form:"publishedAt,omitempty" json:"publishedAt,omitempty" xml:"publishedAt,omitempty"`
 }
 
@@ -57,7 +57,7 @@ type CreateBookResponseBody struct {
 	ID          *int64  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Title       *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	Author      *string `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
-	CoverURL    *string `form:"cover_url,omitempty" json:"cover_url,omitempty" xml:"cover_url,omitempty"`
+	CoverURL    *string `form:"coverUrl,omitempty" json:"coverUrl,omitempty" xml:"coverUrl,omitempty"`
 	PublishedAt *string `form:"publishedAt,omitempty" json:"publishedAt,omitempty" xml:"publishedAt,omitempty"`
 }
 
@@ -67,7 +67,7 @@ type UpdateBookResponseBody struct {
 	ID          *int64  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Title       *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	Author      *string `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
-	CoverURL    *string `form:"cover_url,omitempty" json:"cover_url,omitempty" xml:"cover_url,omitempty"`
+	CoverURL    *string `form:"coverUrl,omitempty" json:"coverUrl,omitempty" xml:"coverUrl,omitempty"`
 	PublishedAt *string `form:"publishedAt,omitempty" json:"publishedAt,omitempty" xml:"publishedAt,omitempty"`
 }
 
@@ -77,7 +77,7 @@ type SetBookCoverResponseBody struct {
 	ID          *int64  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Title       *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	Author      *string `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
-	CoverURL    *string `form:"cover_url,omitempty" json:"cover_url,omitempty" xml:"cover_url,omitempty"`
+	CoverURL    *string `form:"coverUrl,omitempty" json:"coverUrl,omitempty" xml:"coverUrl,omitempty"`
 	PublishedAt *string `form:"publishedAt,omitempty" json:"publishedAt,omitempty" xml:"publishedAt,omitempty"`
 }
 
@@ -393,7 +393,7 @@ type BookResponse struct {
 	ID          *int64  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Title       *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	Author      *string `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
-	CoverURL    *string `form:"cover_url,omitempty" json:"cover_url,omitempty" xml:"cover_url,omitempty"`
+	CoverURL    *string `form:"coverUrl,omitempty" json:"coverUrl,omitempty" xml:"coverUrl,omitempty"`
 	PublishedAt *string `form:"publishedAt,omitempty" json:"publishedAt,omitempty" xml:"publishedAt,omitempty"`
 }
 

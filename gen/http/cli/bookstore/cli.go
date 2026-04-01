@@ -29,7 +29,7 @@ func UsageCommands() []string {
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + " " + "books get-books --title \"p\" --author \"2\" --published-at \"2000-04-01\" --published-after \"1990-02-08\" --published-before \"2014-07-04\" --limit 5971686587402052785 --offset 5897553918948982507" + "\n" +
+	return os.Args[0] + " " + "books get-books --title \"Et neque incidunt id non incidunt.\" --author \"Maxime quaerat.\" --published-at \"2008-01-19\" --published-after \"1998-06-11\" --published-before \"2010-01-22\" --limit 18016711226821573367 --offset 8209354041823650973" + "\n" +
 		""
 }
 
@@ -227,7 +227,7 @@ func booksGetBooksUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books get-books --title \"p\" --author \"2\" --published-at \"2000-04-01\" --published-after \"1990-02-08\" --published-before \"2014-07-04\" --limit 5971686587402052785 --offset 5897553918948982507")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books get-books --title \"Et neque incidunt id non incidunt.\" --author \"Maxime quaerat.\" --published-at \"2008-01-19\" --published-after \"1998-06-11\" --published-before \"2010-01-22\" --limit 18016711226821573367 --offset 8209354041823650973")
 }
 
 func booksGetBookUsage() {
@@ -245,7 +245,7 @@ func booksGetBookUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books get-book --id 5909787674201432190")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books get-book --id 2674905890449714296")
 }
 
 func booksCreateBookUsage() {
@@ -263,7 +263,7 @@ func booksCreateBookUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books create-book --body '{\n      \"author\": \"Eum esse.\",\n      \"publishedAt\": \"2011-11-11\",\n      \"title\": \"Quia rerum odit amet.\"\n   }'")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books create-book --body '{\n      \"author\": \"Officiis nemo quia aut veniam.\",\n      \"publishedAt\": \"1995-06-10\",\n      \"title\": \"Iure neque voluptatum quidem et esse.\"\n   }'")
 }
 
 func booksUpdateBookUsage() {
@@ -283,7 +283,7 @@ func booksUpdateBookUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books update-book --body '{\n      \"author\": \"Eaque beatae natus amet dolor a et.\",\n      \"publishedAt\": \"1998-09-28\",\n      \"title\": \"Ut non ab repellat sed architecto laborum.\"\n   }' --id 8509440648643756047")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books update-book --body '{\n      \"author\": \"Beatae natus amet dolor a.\",\n      \"publishedAt\": \"1973-11-11\",\n      \"title\": \"Laborum magnam.\"\n   }' --id 4333086822311669320")
 }
 
 func booksSetBookCoverUsage() {
@@ -303,7 +303,7 @@ func booksSetBookCoverUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books set-book-cover --body '{\n      \"cover\": \"RXN0IHNpbWlsaXF1ZSBhdXQgYXV0Lg==\"\n   }' --id 2535831667953208005")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books set-book-cover --body '{\n      \"cover\": \"UmVydW0gc2VxdWkgcXVpLg==\"\n   }' --id 6360157331506620616")
 }
 
 func booksDeleteBookUsage() {
@@ -321,5 +321,5 @@ func booksDeleteBookUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books delete-book --id 1287784084538983663")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "books delete-book --id 6790062442604118928")
 }

@@ -18,57 +18,56 @@ paths:
                   allowEmptyValue: true
                   schema:
                     type: string
-                    example: zxl
-                    minLength: 1
-                  example: vyj
+                    example: Atque quos excepturi aliquam dicta quo.
+                  example: Amet neque voluptates.
                 - name: author
                   in: query
                   allowEmptyValue: true
                   schema:
                     type: string
-                    example: x
-                    minLength: 1
-                  example: 7r
+                    example: Voluptatem quia dolores quibusdam.
+                  example: Harum porro.
                 - name: publishedAt
                   in: query
                   allowEmptyValue: true
                   schema:
                     type: string
-                    example: "2007-10-03"
+                    example: "2007-01-18"
                     format: date
-                  example: "2013-01-12"
-                - name: published_after
+                  example: "2010-11-17"
+                - name: publishedAfter
                   in: query
                   allowEmptyValue: true
                   schema:
                     type: string
-                    example: "1970-05-26"
+                    example: "1990-06-15"
                     format: date
-                  example: "2001-01-11"
-                - name: published_before
+                  example: "1972-04-13"
+                - name: publishedBefore
                   in: query
                   allowEmptyValue: true
                   schema:
                     type: string
-                    example: "1982-07-17"
+                    example: "1981-08-20"
                     format: date
-                  example: "1971-11-24"
+                  example: "2013-07-28"
                 - name: limit
                   in: query
                   allowEmptyValue: true
                   schema:
                     type: integer
-                    example: 1484183840119250216
+                    example: 16970450528176820999
                     format: int64
-                  example: 3578128365358530591
+                    minimum: 1
+                  example: 14123794238947936811
                 - name: offset
                   in: query
                   allowEmptyValue: true
                   schema:
                     type: integer
-                    example: 12840632429852050069
+                    example: 12763315690458616135
                     format: int64
-                  example: 11651147724402205983
+                  example: 7246897860964436645
             responses:
                 "200":
                     description: OK response.
@@ -79,32 +78,42 @@ paths:
                                 items:
                                     $ref: '#/components/schemas/Book'
                                 example:
-                                    - author: Optio dolorem.
-                                      cover_url: Dolorem quia.
-                                      id: 3374331773824625157
-                                      publishedAt: "1997-09-18"
-                                      title: Nemo voluptates eum ut deserunt temporibus at.
-                                    - author: Optio dolorem.
-                                      cover_url: Dolorem quia.
-                                      id: 3374331773824625157
-                                      publishedAt: "1997-09-18"
-                                      title: Nemo voluptates eum ut deserunt temporibus at.
+                                    - author: Dolorem quia.
+                                      coverUrl: Aut molestiae voluptatem.
+                                      id: 3342119658407442033
+                                      publishedAt: "1981-03-25"
+                                      title: Optio dolorem.
+                                    - author: Dolorem quia.
+                                      coverUrl: Aut molestiae voluptatem.
+                                      id: 3342119658407442033
+                                      publishedAt: "1981-03-25"
+                                      title: Optio dolorem.
+                                    - author: Dolorem quia.
+                                      coverUrl: Aut molestiae voluptatem.
+                                      id: 3342119658407442033
+                                      publishedAt: "1981-03-25"
+                                      title: Optio dolorem.
                             example:
-                                - author: Optio dolorem.
-                                  cover_url: Dolorem quia.
-                                  id: 3374331773824625157
-                                  publishedAt: "1997-09-18"
-                                  title: Nemo voluptates eum ut deserunt temporibus at.
-                                - author: Optio dolorem.
-                                  cover_url: Dolorem quia.
-                                  id: 3374331773824625157
-                                  publishedAt: "1997-09-18"
-                                  title: Nemo voluptates eum ut deserunt temporibus at.
-                                - author: Optio dolorem.
-                                  cover_url: Dolorem quia.
-                                  id: 3374331773824625157
-                                  publishedAt: "1997-09-18"
-                                  title: Nemo voluptates eum ut deserunt temporibus at.
+                                - author: Dolorem quia.
+                                  coverUrl: Aut molestiae voluptatem.
+                                  id: 3342119658407442033
+                                  publishedAt: "1981-03-25"
+                                  title: Optio dolorem.
+                                - author: Dolorem quia.
+                                  coverUrl: Aut molestiae voluptatem.
+                                  id: 3342119658407442033
+                                  publishedAt: "1981-03-25"
+                                  title: Optio dolorem.
+                                - author: Dolorem quia.
+                                  coverUrl: Aut molestiae voluptatem.
+                                  id: 3342119658407442033
+                                  publishedAt: "1981-03-25"
+                                  title: Optio dolorem.
+                                - author: Dolorem quia.
+                                  coverUrl: Aut molestiae voluptatem.
+                                  id: 3342119658407442033
+                                  publishedAt: "1981-03-25"
+                                  title: Optio dolorem.
                 "404":
                     description: 'not_found: Not Found response.'
                     content:
@@ -129,9 +138,9 @@ paths:
                         schema:
                             $ref: '#/components/schemas/CreateBookRequestBody'
                         example:
-                            author: Eum esse.
-                            publishedAt: "2011-11-11"
-                            title: Quia rerum odit amet.
+                            author: Officiis nemo quia aut veniam.
+                            publishedAt: "1995-06-10"
+                            title: Iure neque voluptatum quidem et esse.
             responses:
                 "201":
                     description: Created response.
@@ -140,11 +149,11 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Book'
                             example:
-                                author: Est eum et reprehenderit deleniti ut voluptas.
-                                cover_url: Neque possimus doloremque.
-                                id: 7196923411108578318
-                                publishedAt: "1985-07-01"
-                                title: Neque eum quaerat ipsam et.
+                                author: Doloremque culpa amet qui.
+                                coverUrl: Nulla pariatur.
+                                id: 3300953106945627634
+                                publishedAt: "2012-08-28"
+                                title: Et neque.
                 "400":
                     description: 'invalid_input: Bad Request response.'
                     content:
@@ -177,9 +186,9 @@ paths:
                   schema:
                     type: integer
                     description: ID of the book
-                    example: 5574627245609559921
+                    example: 7930220653084567795
                     format: int64
-                  example: 8828410291201230889
+                  example: 5112865670883544623
             responses:
                 "204":
                     description: No Content response.
@@ -208,9 +217,9 @@ paths:
                   schema:
                     type: integer
                     description: ID of the book
-                    example: 1358352904264507319
+                    example: 7804121816172218315
                     format: int64
-                  example: 8477452422459716713
+                  example: 4383961357418369433
             responses:
                 "200":
                     description: OK response.
@@ -219,11 +228,11 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Book'
                             example:
-                                author: Qui nesciunt.
-                                cover_url: Et cumque.
-                                id: 7227316530711330698
-                                publishedAt: "2002-01-20"
-                                title: Illo at.
+                                author: Soluta explicabo.
+                                coverUrl: Sed non distinctio.
+                                id: 4281720909231937138
+                                publishedAt: "1996-04-19"
+                                title: Perferendis qui nesciunt alias et cumque eum.
                 "404":
                     description: 'not_found: Not Found response.'
                     content:
@@ -249,9 +258,9 @@ paths:
                   schema:
                     type: integer
                     description: ID of the book
-                    example: 524251577701104994
+                    example: 3515120445461600829
                     format: int64
-                  example: 7652078690695299061
+                  example: 7192883973767832015
             requestBody:
                 required: true
                 content:
@@ -259,9 +268,9 @@ paths:
                         schema:
                             $ref: '#/components/schemas/UpdateBookRequestBody'
                         example:
-                            author: Eaque beatae natus amet dolor a et.
-                            publishedAt: "1998-09-28"
-                            title: Ut non ab repellat sed architecto laborum.
+                            author: Beatae natus amet dolor a.
+                            publishedAt: "1973-11-11"
+                            title: Laborum magnam.
             responses:
                 "200":
                     description: OK response.
@@ -270,11 +279,11 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Book'
                             example:
-                                author: Non odit nisi corrupti dignissimos.
-                                cover_url: Et et in exercitationem facilis.
-                                id: 2280955852903502164
-                                publishedAt: "1973-10-19"
-                                title: Et at neque quaerat ad inventore velit.
+                                author: Inventore velit quibusdam non odit nisi corrupti.
+                                coverUrl: Accusamus et et in.
+                                id: 8509440648643756047
+                                publishedAt: "1996-09-10"
+                                title: Inventore et at neque quaerat.
                 "400":
                     description: 'invalid_input: Bad Request response.'
                     content:
@@ -313,9 +322,9 @@ paths:
                   schema:
                     type: integer
                     description: ID of the book
-                    example: 7072469533959259698
+                    example: 8305992917067369474
                     format: int64
-                  example: 6781663944315393717
+                  example: 1376659783086137200
             requestBody:
                 required: true
                 content:
@@ -324,27 +333,21 @@ paths:
                             $ref: '#/components/schemas/SetBookCoverRequestBody'
                         example:
                             cover:
-                                - 69
-                                - 115
-                                - 116
+                                - 82
+                                - 101
+                                - 114
+                                - 117
+                                - 109
                                 - 32
                                 - 115
-                                - 105
-                                - 109
-                                - 105
-                                - 108
-                                - 105
+                                - 101
                                 - 113
                                 - 117
-                                - 101
+                                - 105
                                 - 32
-                                - 97
+                                - 113
                                 - 117
-                                - 116
-                                - 32
-                                - 97
-                                - 117
-                                - 116
+                                - 105
                                 - 46
             responses:
                 "200":
@@ -354,11 +357,11 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Book'
                             example:
-                                author: Non autem hic consequatur.
-                                cover_url: Natus eos aut odit voluptate id tempore.
-                                id: 8122964174669253699
-                                publishedAt: "2013-11-09"
-                                title: Temporibus voluptatem debitis possimus.
+                                author: Debitis possimus repellat.
+                                coverUrl: Autem hic consequatur.
+                                id: 3673219033162085405
+                                publishedAt: "2013-05-20"
+                                title: Aut molestiae quo impedit temporibus.
                 "400":
                     description: 'invalid_image_format: Bad Request response.'
                     content:
@@ -426,28 +429,28 @@ components:
             properties:
                 author:
                     type: string
-                    example: Voluptates provident.
-                cover_url:
+                    example: Velit architecto.
+                coverUrl:
                     type: string
-                    example: Asperiores dolores molestiae qui suscipit.
+                    example: Sunt ea.
                 id:
                     type: integer
-                    example: 6193106917263990956
+                    example: 3613175950788706460
                     format: int64
                 publishedAt:
                     type: string
-                    example: "2013-11-02"
+                    example: "1985-12-16"
                     format: date
                 title:
                     type: string
-                    example: Non omnis sit quis amet.
+                    example: Consequatur aut.
             description: A single book
             example:
-                author: Voluptas repellat similique.
-                cover_url: Facilis nisi iure quibusdam officiis cumque laudantium.
-                id: 176858279221878788
-                publishedAt: "1984-09-24"
-                title: Id itaque temporibus.
+                author: Esse praesentium sunt non.
+                coverUrl: Fuga quibusdam voluptas provident nobis vel.
+                id: 2575102273866287889
+                publishedAt: "1978-04-29"
+                title: Nisi cupiditate adipisci ipsum reprehenderit animi eum.
             required:
                 - id
                 - title
@@ -459,20 +462,20 @@ components:
                 author:
                     type: string
                     description: Author of the book
-                    example: Eius id blanditiis dignissimos et ipsam.
+                    example: Totam dolores pariatur.
                 publishedAt:
                     type: string
                     description: Publication time of the book
-                    example: "1989-12-16"
+                    example: "1970-04-11"
                     format: date
                 title:
                     type: string
                     description: Title of the book
-                    example: Saepe quia placeat deserunt facere sapiente ad.
+                    example: Ut enim officiis tenetur enim.
             example:
-                author: Quisquam quae.
-                publishedAt: "2004-04-25"
-                title: Sequi amet repellat et ducimus minus.
+                author: Nam non.
+                publishedAt: "1972-05-21"
+                title: Error est temporibus ut possimus laboriosam velit.
             required:
                 - title
                 - author
@@ -483,7 +486,7 @@ components:
                 fault:
                     type: boolean
                     description: Is the error a server-side fault?
-                    example: true
+                    example: false
                 id:
                     type: string
                     description: ID is a unique identifier for this particular occurrence of the problem.
@@ -505,12 +508,12 @@ components:
                     description: Is the error a timeout?
                     example: false
             example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
-                timeout: false
+                temporary: false
+                timeout: true
             required:
                 - name
                 - id
@@ -525,57 +528,84 @@ components:
                     type: string
                     description: Book cover image
                     example:
-                        - 80
-                        - 111
-                        - 114
-                        - 114
+                        - 69
+                        - 120
+                        - 112
+                        - 108
+                        - 105
+                        - 99
+                        - 97
+                        - 98
                         - 111
                         - 32
                         - 105
-                        - 112
+                        - 110
+                        - 32
+                        - 102
+                        - 97
+                        - 99
+                        - 105
+                        - 108
+                        - 105
                         - 115
+                        - 32
+                        - 109
+                        - 111
+                        - 108
+                        - 108
+                        - 105
+                        - 116
+                        - 105
                         - 97
                         - 32
+                        - 109
                         - 97
-                        - 117
-                        - 116
-                        - 101
+                        - 103
+                        - 110
+                        - 97
                         - 109
                         - 46
                     format: binary
             example:
                 cover:
-                    - 82
-                    - 101
-                    - 99
-                    - 117
-                    - 115
+                    - 78
+                    - 105
+                    - 104
+                    - 105
+                    - 108
+                    - 32
+                    - 98
+                    - 108
                     - 97
                     - 110
                     - 100
-                    - 97
-                    - 101
-                    - 32
-                    - 101
-                    - 120
-                    - 99
-                    - 101
-                    - 112
-                    - 116
-                    - 117
-                    - 114
-                    - 105
-                    - 32
-                    - 118
                     - 105
                     - 116
-                    - 97
-                    - 101
+                    - 105
+                    - 105
+                    - 115
                     - 32
                     - 113
                     - 117
                     - 97
+                    - 115
+                    - 105
+                    - 32
+                    - 100
+                    - 111
+                    - 108
+                    - 111
+                    - 114
+                    - 105
+                    - 98
+                    - 117
+                    - 115
+                    - 32
+                    - 114
                     - 101
+                    - 114
+                    - 117
+                    - 109
                     - 46
             required:
                 - cover
@@ -585,20 +615,20 @@ components:
                 author:
                     type: string
                     description: Author of the book
-                    example: Accusantium et.
+                    example: Veniam sit sed quis iure.
                 publishedAt:
                     type: string
                     description: Publication time of the book
-                    example: "1980-09-30"
+                    example: "2005-07-31"
                     format: date
                 title:
                     type: string
                     description: Title of the book
-                    example: Ab deserunt reiciendis ut et est reiciendis.
+                    example: Alias qui eveniet.
             example:
-                author: Doloribus eum et qui.
-                publishedAt: "2007-11-20"
-                title: Qui hic beatae neque et quibusdam.
+                author: Ex ut saepe.
+                publishedAt: "1995-03-02"
+                title: Sit non est.
 tags:
     - name: books
       description: Service that returns data about books

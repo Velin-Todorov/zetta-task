@@ -34,22 +34,20 @@ var _ = Service("books", func() {
 	Method("getBooks", func() {
 		Result(ArrayOf(Book))
 		Payload(func() {
-			Attribute("title", String, func() {
-				MinLength(1)
-			})
-			Attribute("author", String, func() {
-				MinLength(1)
-			})
+			Attribute("title", String)
+			Attribute("author", String)
 			Attribute("publishedAt", String, func() {
 				Format(FormatDate)
 			})
-			Attribute("published_after", String, func() {
+			Attribute("publishedAfter", String, func() {
 				Format(FormatDate)
 			})
-			Attribute("published_before", String, func() {
+			Attribute("publishedBefore", String, func() {
 				Format(FormatDate)
 			})
-			Attribute("limit", UInt64)
+			Attribute("limit", UInt64, func() {
+				Minimum(1)
+			})
 			Attribute("offset", UInt64)
 		})
 
@@ -58,8 +56,8 @@ var _ = Service("books", func() {
 			Param("title")
 			Param("author")
 			Param("publishedAt")
-			Param("published_after")
-			Param("published_before")
+			Param("publishedAfter")
+			Param("publishedBefore")
 			Param("limit")
 			Param("offset")
 			Response(StatusOK, func() {
